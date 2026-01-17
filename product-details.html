@@ -4,51 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تفاصيل المنتج</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --main: #0055ff; --bg: #f4f7f6; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        .container { max-width: 500px; margin: auto; background: white; min-height: 100vh; }
-        .header { padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee; }
-        .content { padding: 20px; text-align: center; }
-        .p-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 20px; }
-        .p-title { font-size: 1.5rem; font-weight: 900; margin: 15px 0; }
-        .info-box { text-align: right; background: #f9fafb; padding: 20px; border-radius: 15px; line-height: 1.8; color: #444; margin-top: 20px; border: 1px solid #eee; }
-        .btn-wa { display: block; background: #25d366; color: white; text-decoration: none; padding: 15px; border-radius: 15px; font-weight: 900; margin-top: 20px; }
+        body { font-family: 'Cairo', sans-serif; background: #f4f7fa; margin: 0; padding: 20px; text-align: center; }
+        .card { background: white; max-width: 500px; margin: auto; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        img { width: 100%; border-radius: 15px; }
+        h1 { color: #1e293b; }
+        .price { color: #0055ff; font-size: 24px; font-weight: 900; margin: 10px 0; }
+        .desc { color: #64748b; line-height: 1.6; text-align: right; padding: 10px; }
+        .btn { background: #22c55e; color: white; padding: 15px 30px; border-radius: 10px; text-decoration: none; display: block; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="header">
-        <a href="index.html" style="color: var(--main); text-decoration: none;"><i class="fas fa-arrow-right"></i>  عودة     _ </a>
-        <span style="font-weight: 900;">تفاصيل المنتج </span>
+    <div class="card">
+        <img id="p-img" src="">
+        <h1 id="p-title"></h1>
+        <div class="price" id="p-price"></div>
+        <div class="desc" id="p-desc"></div>
+        <a id="wa-link" href="#" class="btn">اطلب عبر واتساب الآن</a>
     </div>
 
-    <div class="content">
-        <img id="p-img" class="p-img">
-        <h1 id="p-name" class="p-title"></h1>
-        <h2 id="p-price" style="color: var(--main); margin-bottom: 20px;"></h2>
-        
-        <div class="info-box">
-            <strong style="color: var(--main);"><i class="fas fa-info-circle"></i> مواصفات المنتج:</strong>
-            <div id="p-info" style="margin-top: 10px; white-space: pre-wrap;"></div>
-        </div>
-
-        <a id="wa-btn" class="btn-wa">اطلب عبر واتساب</a>
-    </div>
-</div>
-
-<script>
-    const params = new URLSearchParams(window.location.search);
-    
-    document.getElementById('p-name').innerText = params.get('name');
-    document.getElementById('p-img').src = params.get('img');
-    document.getElementById('p-price').innerText = params.get('price') + " ريال";
-    document.getElementById('p-info').innerText = decodeURIComponent(params.get('info'));
-    
-    document.getElementById('wa-btn').href = `https://wa.me/967774548481?text=أود طلب المنتج: ${params.get('name')}`;
-</script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const data = JSON.parse(decodeURIComponent(params.get('p')));
+        document.getElementById('p-title').innerText = data.n;
+        document.getElementById('p-price').innerText = data.pr + " ريال";
+        document.getElementById('p-img').src = data.im;
+        document.getElementById('p-desc').innerText = data.ds;
+        document.getElementById('wa-link').href = `https://wa.me/967774548481?text=أريد طلب: ${data.n}`;
+    </script>
 </body>
 </html>
