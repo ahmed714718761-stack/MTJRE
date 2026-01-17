@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>من نحن | متجر MTJRE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --main: #0055ff; --bg: #f8fafc; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); }
+        
+        header { 
+            background: white; padding: 15px 8%; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top:0; z-index:100;
+        }
+        .back-btn { text-decoration: none; color: var(--main); font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        
+        /* تصغير وحماية حجم الشعار */
+        .logo-box img { height: 40px; width: auto; object-fit: contain; }
+
+        .hero-about { padding: 60px 8%; text-align: center; background: linear-gradient(180deg, #e0e7ff 0%, transparent 100%); }
+        .hero-about h1 { font-size: 2.5rem; color: var(--main); margin-bottom: 20px; font-weight: 900; }
+        
+        .content-card { 
+            background: white; margin: -40px 8% 40px; padding: 40px; 
+            border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); line-height: 1.8;
+        }
+        
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+        .f-item { background: #f1f5f9; padding: 25px; border-radius: 20px; text-align: center; }
+        .f-item i { font-size: 2rem; color: var(--main); margin-bottom: 15px; }
+        
+        footer { text-align: center; padding: 40px; color: #64748b; font-size: 0.9rem; border-top: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i> الرجوع للمتجر</a>
+    <div class="logo-box">
+        <img id="about-page-logo" src="" alt="Logo">
+    </div>
+</header>
+
+<section class="hero-about">
+    <h1>قصتنا ورؤيتنا</h1>
+    <p>تعرف على متجري MTJRE وكيف نسعى لخدمتكم</p>
+</section>
+
+<div class="content-card">
+    <p>
+        نحن في <strong>MTJRE</strong> نؤمن بأن الجودة هي أساس الثقة. انطلقنا لنوفر لعملائنا في اليمن تجربة تسوق إلكترونية آمنة وسهلة، مع توفير خيارات دفع متعددة تناسب الجميع.
+    </p>
+
+    <div class="features-grid">
+        <div class="f-item"><i class="fas fa-check-circle"></i><h3>جودة أصلية</h3></div>
+        <div class="f-item"><i class="fas fa-truck"></i><h3>توصيل سريع</h3></div>
+        <div class="f-item"><i class="fas fa-user-shield"></i><h3>دعم متواصل</h3></div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer-copy">جميع الحقوق محفوظة © 2026 لمتجري MTJRE</div>
+</footer>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyp0cqDF0TAJs_w_btZom_axdctb6oUFgnHXGJkU4qSNQLG_75VXXLsPeaFx_ciAeMj4g/exec';
+
+    async function loadAboutData() {
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+
+            // التأكد من الوصول لجدول الإعدادات بشكل صحيح
+            // في جدولك: B2 هو الشعار و B4 هو اسم المتجر
+            const logoUrl = data.settings[1][1]; 
+            const storeName = data.settings[3][1];
+
+            if(logoUrl) {
+                document.getElementById('about-page-logo').src = logoUrl;
+            }
+            
+            if(storeName) {
+                document.getElementById('footer-copy').innerText = `جميع الحقوق محفوظة © 2026 لمتجري ${storeName}`;
+            }
+
+        } catch (e) {
+            console.error("فشل تحميل الشعار:", e);
+        }
+    }
+
+    window.onload = loadAboutData;
+</script>
+</body>
+</html>
