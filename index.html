@@ -3,208 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر MTJRE الاحترافي</title>
+    <title>متجر MTJRE</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        :root { --main: #0055ff; --bg: #f4f7fa; --radius: 15px; --red: #ff3b3b; }
+        :root { --main: #0055ff; --bg: #f4f7fa; --radius: 12px; --red: #ff3b3b; }
         body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; }
         
-        /* الهيدر وتكبير الشعار */
-        header { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); sticky: top; z-index: 1000; }
-        #logo { height: 70px; object-fit: contain; } /* شعار كبير وواضح */
-        .nav-btns { display: flex; gap: 10px; }
-        .about-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        /* تحسين الهيدر وزر من نحن */
+        header { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        #logo { height: 60px; object-fit: contain; }
+        .about-btn { background: #f0f7ff; color: var(--main); border: 1.5px solid var(--main); padding: 5px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 14px; }
 
-        /* شريط الإعلان */
-        .ticker-wrap { background: var(--main); color: white; padding: 10px 0; overflow: hidden; }
-        .ticker-content { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scroll-ticker 25s linear infinite; font-weight: 900; }
+        /* تنسيق شريط الإعلانات */
+        .ticker-wrap { background: var(--main); color: white; padding: 8px 0; overflow: hidden; font-weight: bold; }
+        .ticker-content { display: inline-block; white-space: nowrap; animation: scroll-ticker 20s linear infinite; padding-left: 100%; }
         @keyframes scroll-ticker { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        /* السلايدر */
-        .slider-wrapper { width: 92%; margin: 15px auto; height: 180px; overflow: hidden; border-radius: var(--radius); position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .banners-slider { display: flex; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
-        .slide { min-width: 100%; background-size: cover; background-position: center; position: relative; }
-        .slide-overlay { position: absolute; top: 10px; right: 10px; background: var(--red); color: white; padding: 5px 15px; border-radius: 50px; font-weight: 900; font-size: 0.8rem; animation: pulse 2s infinite; }
+        /* تنسيق شبكة المنتجات (3 أعمدة) */
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+        .p-card { background: white; border-radius: var(--radius); padding: 8px; text-align: center; border: 1px solid #eee; position: relative; display: flex; flex-direction: column; transition: 0.3s; }
+        .p-badge { position: absolute; top: 5px; left: 5px; background: var(--red); color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 900; z-index: 2; }
+        .p-img { width: 100%; height: 85px; object-fit: contain; margin-bottom: 5px; }
+        .p-name { font-size: 11px; font-weight: 700; height: 32px; overflow: hidden; color: #333; line-height: 1.4; }
+        .price-now { color: var(--main); font-weight: 900; font-size: 13px; }
+        .old-price { text-decoration: line-through; color: #999; font-size: 10px; margin-left: 4px; }
 
-        /* المنتجات 3 أعمدة */
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
-        .p-card { background: white; border-radius: var(--radius); padding: 10px; text-align: center; border: 1px solid #eee; position: relative; display: flex; flex-direction: column; transition: 0.3s; }
-        .p-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        
-        /* علامة الخصم فوق المنتج */
-        .badge { position: absolute; top: 5px; left: 5px; background: var(--red); color: white; font-size: 0.6rem; padding: 2px 8px; border-radius: 5px; font-weight: 900; z-index: 2; }
-        
-        .p-img { width: 100%; height: 90px; object-fit: contain; margin-bottom: 8px; }
-        .p-name { font-size: 0.75rem; font-weight: 700; height: 35px; overflow: hidden; margin-bottom: 5px; color: #333; }
-        .price-area { margin-bottom: 10px; }
-        .price-now { color: var(--main); font-weight: 900; font-size: 0.9rem; display: block; }
-        .old-price { text-decoration: line-through; color: #999; font-size: 0.65rem; }
+        .btn-order { background: #22c55e; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 11px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 5px; }
+        .btn-details { background: #f8fafc; color: var(--main); border: 1px solid #e2e8f0; padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; width: 100%; margin-top: 5px; }
 
-        /* الأزرار */
-        .btn-group { display: flex; flex-direction: column; gap: 5px; margin-top: auto; }
-        .btn-order { background: #22c55e; color: white; border: none; padding: 8px; border-radius: 8px; font-size: 0.7rem; font-weight: 900; cursor: pointer; }
-        .btn-details { background: #f0f7ff; color: var(--main); border: 1px solid var(--main); padding: 7px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
-
-        /* نافذة تفاصيل المنتج */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 85%; max-height: 80%; border-radius: 20px; padding: 20px; overflow-y: auto; position: relative; }
-        .close-modal { position: absolute; top: 10px; left: 10px; font-size: 1.5rem; cursor: pointer; }
-
-        /* التعليقات والتسجيل */
-        .comments-sec { background: white; padding: 25px 5%; border-radius: 30px 30px 0 0; margin-top: 30px; box-shadow: 0 -10px 20px rgba(0,0,0,0.05); }
-        .login-box { background: #fff3cd; padding: 20px; border-radius: 15px; text-align: center; border: 2px dashed #e67e22; margin-bottom: 20px; }
-        
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .wa-float { position: fixed; bottom: 20px; left: 20px; background: #25d366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.2); text-decoration: none; }
+        /* إصلاح شكل التعليقات */
+        .comments-sec { background: white; padding: 20px; border-radius: 20px 20px 0 0; margin-top: 20px; }
+        #user-msg { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #ddd; font-family: 'Cairo', sans-serif; font-size: 14px; box-sizing: border-box; text-align: right; margin-bottom: 10px; }
+        .comment-item { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 8px; border-right: 4px solid var(--main); }
     </style>
 </head>
 <body>
 
 <header>
-    <img id="logo" src="" alt="MTJRE LOGO">
-    <div class="nav-btns">
-        <button class="about-btn" onclick="showAbout()">من نحن</button>
-        <div id="user-display" style="font-size: 0.7rem; font-weight: 900; color: var(--main);"></div>
-    </div>
+    <img id="logo" src="" alt="MTJRE">
+    <button class="about-btn" onclick="showAbout()">من نحن</button>
 </header>
 
-<div id="ticker-wrap" class="ticker-wrap">
+<div id="ticker-wrap" class="ticker-wrap" style="display:none;">
     <div id="ticker-text" class="ticker-content"></div>
-</div>
-
-<div class="slider-wrapper">
-    <div id="banners-slider" class="banners-slider"></div>
 </div>
 
 <div id="products-list" class="grid"></div>
 
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
-        <img id="m-img" src="" style="width:100%; height:200px; object-fit:contain;">
-        <h2 id="m-name"></h2>
-        <p id="m-price" style="color:var(--main); font-weight:900; font-size:1.5rem;"></p>
-        <div id="m-desc" style="line-height:1.6; color:#555;"></div>
-        <button id="m-order-btn" class="btn-order" style="width:100%; padding:15px; font-size:1rem; margin-top:20px;">اطلب الآن عبر الواتساب</button>
-    </div>
-</div>
-
 <div class="comments-sec">
-    <h3>💬 آراء العملاء</h3>
-    <div id="comments-list"></div>
+    <h3 style="font-size: 16px; margin-bottom: 15px;">💬 آراء العملاء</h3>
+    <div id="comments-list" style="margin-bottom: 20px;"></div>
     <div id="auth-area">
-        <div class="login-box">
-            <p style="font-weight:bold; margin-bottom:15px;">يجب تسجيل الدخول بالبريد لتتمكن من الطلب والتعليق ✅</p>
-            <div id="g_id_onload"
-                 data-client_id="923000367565-2scjbaaiuvqjad8fsts4c2l9ot77l4v9.apps.googleusercontent.com"
-                 data-callback="onSignIn">
-            </div>
-            <div class="g_id_signin" data-type="standard"></div>
-        </div>
+        <textarea id="user-msg" placeholder="اكتب رأيك هنا بوضوح..."></textarea>
+        <button onclick="sendReview()" style="background:var(--main); color:white; border:none; width:100%; padding:12px; border-radius:10px; font-weight:bold; font-family:'Cairo';">نشر التعليق</button>
     </div>
 </div>
-
-<a href="https://wa.me/967774548481" class="wa-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
 <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbyY7sB1xbgypkQrJ-qOvoq3WLGIcZ5VjB49c8mVUhvWdvej15JxQe8PKBl1IBDlRh-Vaw/exec';
-    let user = null;
+    let user = { name: "زائر", email: "guest@mtjre.com" }; // سيتم تحديثه عند ربط جوجل بشكل كامل
 
-    function onSignIn(response) {
-        const payload = JSON.parse(atob(response.credential.split('.')[1]));
-        user = { name: payload.name, email: payload.email };
-        document.getElementById('user-display').innerText = user.name.split(' ')[0];
-        document.getElementById('auth-area').innerHTML = `
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <textarea id="user-msg" style="padding:15px; border-radius:15px; border:1px solid #ddd;" placeholder="اكتب رأيك يا ${user.name}..." rows="3"></textarea>
-                <button onclick="sendReview()" style="background:var(--main); color:white; border:none; padding:12px; border-radius:12px; font-weight:bold; cursor:pointer;">نشر التعليق</button>
-            </div>`;
+    function showAbout() {
+        alert("متجر MTJRE: وجهتك الأولى للحصول على أفضل المنتجات بأعلى جودة وأنسب سعر. نحن نهتم برضاكم دائماً.");
     }
 
     async function loadData() {
-        const res = await fetch(API_URL);
-        const data = await res.json();
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            
+            // تحديث الشعار والإعلان
+            document.getElementById('logo').src = data.settings[1][1];
+            if(data.settings[7] && data.settings[7][1]) {
+                document.getElementById('ticker-wrap').style.display = 'block';
+                document.getElementById('ticker-text').innerText = data.settings[7][1];
+            }
 
-        // الإعدادات والشعار
-        document.getElementById('logo').src = data.settings[1][1];
-        if(data.settings[7]) {
-            document.getElementById('ticker-wrap').style.display = 'block';
-            document.getElementById('ticker-text').innerText = data.settings[7][1];
-        }
-
-        // السلايدر مع نص الخصم
-        document.getElementById('banners-slider').innerHTML = data.banners.slice(1).map(b => `
-            <div class="slide" style="background-image: url('${b[2]}')">
-                <div class="slide-overlay">${b[1]}</div>
-            </div>
-        `).join('');
-        
-        let slideIdx = 0;
-        setInterval(() => {
-            slideIdx = (slideIdx + 1) % (data.banners.length - 1);
-            document.getElementById('banners-slider').style.transform = `translateX(${slideIdx * 100}%)`;
-        }, 4000);
-
-        // المنتجات مع علامة الخصم والتفاصيل
-        document.getElementById('products-list').innerHTML = data.products.slice(1).map(p => `
-            <div class="p-card">
-                ${p[6] ? `<div class="badge">خصم ${p[6]}%</div>` : ''}
-                <img src="${p[4]}" class="p-img">
-                <div class="p-name">${p[1]}</div>
-                <div class="price-area">
-                    <span class="old-price">${(p[2]*1.2).toFixed(0)} ريال</span>
-                    <span class="price-now">${p[2]} ريال</span>
-                </div>
-                <div class="btn-group">
-                    <button class="btn-details" onclick="openDetails('${p[1]}', '${p[4]}', '${p[2]}', '${p[7]||''}')">التفاصيل</button>
+            // عرض المنتجات
+            document.getElementById('products-list').innerHTML = data.products.slice(1).map(p => `
+                <div class="p-card">
+                    ${p[6] ? `<div class="p-badge">خصم ${p[6]}%</div>` : ''}
+                    <img src="${p[4]}" class="p-img">
+                    <div class="p-name">${p[1]}</div>
+                    <div>
+                        <span class="old-price">${(p[2]*1.2).toFixed(0)}</span>
+                        <span class="price-now">${p[2]} ريال</span>
+                    </div>
+                    <button class="btn-details" onclick="alert('${p[7] || 'منتج مميز جداً متوفر الآن.'}')">التفاصيل</button>
                     <button class="btn-order" onclick="submitOrder('${p[1]}', '${p[2]}')">اطلب الآن</button>
-                </div>
-            </div>
-        `).join('');
+                </div>`).join('');
 
-        // التعليقات
-        document.getElementById('comments-list').innerHTML = data.comments.slice(1).reverse().slice(0, 5).map(c => `
-            <div style="background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:8px; border-right:4px solid var(--main);">
-                <div style="font-weight:900; font-size:0.7rem; color:var(--main);">${c[0]} ✅</div>
-                <div style="font-size:0.75rem;">${c[1]}</div>
-            </div>
-        `).join('');
+            // عرض التعليقات
+            document.getElementById('comments-list').innerHTML = data.comments.slice(1).reverse().slice(0, 3).map(c => `
+                <div class="comment-item">
+                    <b style="font-size:12px;">${c[0]} ✅</b><br>
+                    <span style="font-size:13px; color:#555;">${c[1]}</span>
+                </div>`).join('');
+        } catch (e) { console.error("خطأ في التحميل:", e); }
     }
-
-    function openDetails(name, img, price, desc) {
-        document.getElementById('m-name').innerText = name;
-        document.getElementById('m-img').src = img;
-        document.getElementById('m-price').innerText = price + " ريال";
-        document.getElementById('m-desc').innerText = desc || "لا توجد تفاصيل إضافية لهذا المنتج.";
-        document.getElementById('m-order-btn').onclick = () => submitOrder(name, price);
-        document.getElementById('productModal').style.display = 'flex';
-    }
-
-    function closeModal() { document.getElementById('productModal').style.display = 'none'; }
 
     async function submitOrder(pName, pPrice) {
-        if(!user) {
-            alert("⚠️ يرجى تسجيل الدخول أولاً من أسفل الصفحة لتتمكن من الطلب");
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            return;
-        }
-        await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'add_order', customer_name: user.name, customer_email: user.email, name_order: pName, amount_order: pPrice })
-        });
-        window.location.href = `https://wa.me/967774548481?text=${encodeURIComponent("طلب جديد\nالاسم: "+user.name+"\nالمنتج: "+pName)}`;
+        window.location.href = `https://wa.me/967774548481?text=${encodeURIComponent("أريد طلب المنتج التالي:\n" + pName + "\nالسعر: " + pPrice)}`;
     }
 
     async function sendReview() {
         const msg = document.getElementById('user-msg').value;
-        if(!msg) return alert("اكتب رأيك أولاً");
+        if(!msg) { alert("من فضلك اكتب تعليقاً أولاً"); return; }
         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'add_comment', name: user.name, email: user.email, comment: msg }) });
-        alert("شكراً لك! تم نشر تعليقك"); location.reload();
+        alert("تم إرسال تعليقك بنجاح!");
+        location.reload();
     }
-
-    function showAbout() { alert("متجر MTJRE: متجركم الأول لكل ما هو مميز وجديد. فخورون بخدمتكم!"); }
 
     window.onload = loadData;
 </script>
