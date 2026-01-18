@@ -9,67 +9,62 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root { --main: #0055ff; --bg: #f4f7fa; --red: #ff3b3b; --dark: #1e293b; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; overflow-x: hidden; }
-        
-        /* 1. شريط الأخبار المتحرك */
-        .ticker { background: var(--main); color: white; padding: 10px; overflow: hidden; white-space: nowrap; font-size: 14px; font-weight: bold; position: relative; }
-        .ticker-text { display: inline-block; animation: ticker-kf 25s linear infinite; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; }
+
+        /* شريط الأخبار المتحرك */
+        .ticker { background: var(--main); color: white; padding: 10px; overflow: hidden; white-space: nowrap; font-size: 14px; font-weight: bold; }
+        .ticker-content { display: inline-block; animation: ticker-kf 25s linear infinite; }
         @keyframes ticker-kf { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        /* 2. الهيدر والبحث */
-        header { background: white; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); sticky; top:0; z-index:1000; }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        #logo { height: 50px; object-fit: contain; }
-        .search-container { position: relative; width: 100%; }
-        #searchInput { width: 100%; padding: 12px 45px 12px 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: 'Cairo'; outline: none; box-sizing: border-box; }
-        .search-container i { position: absolute; right: 15px; top: 15px; color: #94a3b8; }
+        /* الهيدر والبحث */
+        header { background: white; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        #logo { height: 50px; }
+        .search-container { position: relative; margin-top: 10px; }
+        #searchInput { width: 100%; padding: 12px 40px 12px 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-family: 'Cairo'; }
+        .search-container i { position: absolute; right: 15px; top: 15px; color: #999; }
 
-        /* 3. الأقسام والسلايدر */
-        .cats { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5%; scrollbar-width: none; background: white; border-bottom: 1px solid #eee; }
-        .cat-item { background: #f1f5f9; padding: 6px 15px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; transition: 0.3s; }
+        /* الأقسام والسلايدر */
+        .cats { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5%; background: white; scrollbar-width: none; border-bottom: 1px solid #eee; }
+        .cat-item { background: #f1f5f9; padding: 5px 15px; border-radius: 50px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
         .cat-item.active { background: var(--main); color: white; }
 
         .slider { width: 92%; margin: 15px auto; height: 160px; border-radius: 15px; overflow: hidden; position: relative; }
         .slide { width: 100%; height: 100%; background-size: cover; background-position: center; display: none; }
         .slide.active { display: block; }
-        
-        /* 4. حركات الوميض والنبض */
-        .blink { animation: blinker 1s linear infinite; background: var(--red); color: white; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; position: absolute; top: 5px; left: 5px; }
-        @keyframes blinker { 50% { opacity: 0; } }
-        
-        .pulse { animation: pulse-blue 2s infinite; }
-        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(0, 85, 255, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(0, 85, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 85, 255, 0); } }
 
-        /* 5. شبكة المنتجات (3 في الصف) */
+        /* الوميض والنبض */
+        .blink { animation: blink-kf 1s linear infinite; background: var(--red); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; position: absolute; top: 5px; left: 5px; font-weight: bold; }
+        @keyframes blink-kf { 50% { opacity: 0; } }
+        
+        .pulse { animation: pulse-kf 2s infinite; position: fixed; bottom: 85px; left: 20px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2000; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        @keyframes pulse-kf { 0% { box-shadow: 0 0 0 0 rgba(0, 85, 255, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(0, 85, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 85, 255, 0); } }
+
+        /* شبكة المنتجات (3 في الصف) */
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
-        .p-card { background: white; border-radius: 12px; padding: 8px; text-align: center; border: 1px solid #eee; position: relative; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
-        .p-img { width: 100%; height: 80px; object-fit: contain; }
-        .p-name { font-size: 10px; font-weight: bold; height: 30px; overflow: hidden; margin: 5px 0; line-height: 1.2; }
-        .price-tag { color: var(--main); font-weight: 900; font-size: 12px; }
+        .p-card { background: white; border-radius: 12px; padding: 8px; text-align: center; border: 1px solid #eee; position: relative; }
+        .p-img { width: 100%; height: 75px; object-fit: contain; }
+        .p-name { font-size: 10px; font-weight: bold; height: 30px; overflow: hidden; margin: 5px 0; }
+        .p-price { color: var(--main); font-weight: 900; font-size: 12px; }
         .btn-act { border: none; padding: 6px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; font-family: 'Cairo'; text-decoration: none; display: block; }
-        .btn-add { background: var(--main); color: white; }
-        .btn-info { background: #f0f7ff; color: var(--main); border: 1px solid var(--main); }
 
-        /* 6. السلة والتعليقات والفوتر */
-        .cart-btn { position: fixed; bottom: 85px; left: 20px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer; }
-        .badge { position: absolute; top: 0; right: 0; background: var(--red); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+        /* الفوتر (الذيل) والمحافظ */
+        footer { background: var(--dark); color: white; padding: 30px 5% 100px; text-align: right; }
+        .wallet-card { background: #2d3748; padding: 10px; border-radius: 10px; margin-bottom: 8px; border-right: 4px solid var(--main); cursor: pointer; }
+        #clock { color: var(--main); font-weight: bold; margin-bottom: 15px; font-size: 12px; }
 
-        footer { background: var(--dark); color: #e2e8f0; padding: 40px 5% 100px; text-align: right; }
-        .wallet-card { background: #2d3748; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--main); cursor: pointer; }
-        #live-clock { color: var(--main); font-weight: bold; font-size: 13px; margin-bottom: 10px; }
-
+        /* مودال السلة */
         .modal { display: none; position: fixed; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 85%; border-radius: 20px; padding: 20px; color: var(--dark); }
     </style>
 </head>
 <body>
 
-<div class="ticker"><div id="ticker-text" class="ticker-text">جارِ تحميل البيانات...</div></div>
+<div class="ticker"><div id="ticker-text" class="ticker-content">جارِ تحميل آخر العروض...</div></div>
 
 <header>
-    <div class="nav-top">
-        <img id="logo" src="" alt="MTJRE">
-        <div id="user-info" style="font-size: 12px; font-weight: bold; color: var(--main);"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <img id="logo" src="">
+        <div id="user-info" style="font-size:12px; font-weight:bold; color:var(--main);"></div>
     </div>
     <div class="search-container">
         <i class="fa fa-search"></i>
@@ -77,7 +72,7 @@
     </div>
 </header>
 
-<div id="slider-box" class="slider"></div>
+<div id="slider" class="slider"></div>
 <div id="cats-bar" class="cats"></div>
 <div id="products-grid" class="grid"></div>
 
@@ -90,59 +85,57 @@
     </div>
 </div>
 
-<div class="cart-btn pulse" onclick="openCart()">
-    <i class="fa fa-shopping-cart" style="font-size: 24px;"></i>
-    <span id="cart-num" class="badge">0</span>
+<div class="pulse" onclick="openCart()">
+    <i class="fa fa-shopping-basket" style="font-size: 24px;"></i>
+    <span id="cart-num" style="position:absolute; top:0; right:0; background:red; border-radius:50%; width:20px; height:20px; font-size:12px; display:flex; align-items:center; justify-content:center;">0</span>
 </div>
 
 <div id="cartModal" class="modal">
     <div class="modal-content">
-        <h3>🛒 السلة</h3>
-        <div id="cart-list" style="max-height: 200px; overflow-y: auto;"></div>
+        <h3>🛒 سلة المشتريات</h3>
+        <div id="cart-items-list" style="max-height: 200px; overflow-y: auto;"></div>
         <hr>
         <div style="display:flex; justify-content:space-between; font-weight:bold;">
             <span>الإجمالي:</span><span id="total-price">0</span><span> ريال</span>
         </div>
-        <button onclick="checkout()" style="width:100%; background:#22c55e; color:white; border:none; padding:12px; border-radius:10px; margin-top:15px; font-family:'Cairo'; font-weight:bold;">اطلب عبر واتساب</button>
+        <button onclick="checkout()" style="width:100%; background:#22c55e; color:white; border:none; padding:12px; border-radius:10px; margin-top:15px; font-family:'Cairo'; font-weight:bold;">إتمام الطلب (واتساب)</button>
         <button onclick="closeCart()" style="width:100%; margin-top:5px; background:#eee; border:none; padding:10px; border-radius:10px;">إغلاق</button>
     </div>
 </div>
 
 <footer>
-    <div id="live-clock"></div>
-    <span style="color:var(--main); font-weight:bold;">📍 العنوان:</span>
-    <p id="footer-addr"></p>
-    <span style="color:var(--main); font-weight:bold;">💳 حسابات التحويل:</span>
+    <div id="clock"></div>
+    <p id="footer-addr" style="font-size: 13px;"></p>
+    <div style="margin: 15px 0; font-weight: bold; color: var(--main);">💳 حسابات التحويل:</div>
     <div id="wallets-list"></div>
     <a id="wa-direct" href="#" style="background:#22c55e; color:white; padding:12px; border-radius:10px; text-decoration:none; display:block; text-align:center; font-weight:bold; margin-top:20px;"><i class="fab fa-whatsapp"></i> تواصل مباشر واتساب</a>
-    <p style="text-align:center; margin-top:30px; font-size:11px; opacity:0.6;">جميع الحقوق محفوظة لـ متجر MTJRE © 2026</p>
+    <p style="text-align:center; margin-top:30px; font-size:11px; opacity:0.6;">جميع الحقوق محفوظة لمتجر MTJRE © 2026</p>
 </footer>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8U1iTWD9YON2FEo-oRT0uYt8khfrJblKM7xk-ZZJT5UzbFSdETB7L74TAWmEIjXnquQ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyD-mkAPf097v-7JTJJzwpuxQMbTFdEy6fC3Ig-IT87H1u7z1A0qWHcb1AjA4W9usjacw/exec';
     let db = [], cart = [], user = null;
 
-    // 1. الساعة الحية
+    // الساعة والتاريخ
     setInterval(() => {
-        const now = new Date();
-        document.getElementById('live-clock').innerText = "📅 " + now.toLocaleDateString('ar-YE') + " | ⏰ " + now.toLocaleTimeString('ar-YE');
+        document.getElementById('clock').innerText = "📅 " + new Date().toLocaleString('ar-YE');
     }, 1000);
 
     async function init() {
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         
-        // الإعدادات
+        // جلب الإعدادات من PDF صفحة 5
         document.getElementById('logo').src = data.settings[1][1];
         document.getElementById('ticker-text').innerText = data.settings[7][1];
-        document.getElementById('footer-addr').innerText = data.settings[4][1];
+        document.getElementById('footer-addr').innerText = "📍 " + data.settings[4][1];
         document.getElementById('wa-direct').href = "https://wa.me/" + data.settings[3][1];
 
-        // البنرات
-        document.getElementById('slider-box').innerHTML = data.banners.slice(1).map((b, i) => `
+        // البنرات صفحة 4
+        document.getElementById('slider').innerHTML = data.banners.slice(1).map((b, i) => `
             <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')"></div>`).join('');
 
-        // المحافظ
+        // المحافظ صفحة 7
         document.getElementById('wallets-list').innerHTML = data.wallets.slice(1).map(w => `
             <div class="wallet-card" onclick="alert('رقم الحساب: ${w[1]}')"><b>${w[0]}</b>: ${w[1]}</div>`).join('');
 
@@ -152,7 +145,7 @@
         document.getElementById('cats-bar').innerHTML = cats.map(c => `
             <div class="cat-item ${c==='الكل'?'active':''}" onclick="filter('${c}', this)">${c}</div>`).join('');
         
-        // التعليقات
+        // التعليقات صفحة 3
         document.getElementById('comments-list').innerHTML = data.comments.slice(1).reverse().slice(0, 3).map(c => `
             <div class="comment-item" style="border-bottom:1px solid #eee; padding:10px 0;"><b>${c[0]} ✅</b><p style="font-size:12px; margin:5px 0;">${c[1]}</p></div>`).join('');
 
@@ -167,19 +160,18 @@
                 ${p[6] ? `<div class="blink">خصم ${p[6]}%</div>` : ''}
                 <img src="${p[4]}" class="p-img">
                 <div class="p-name">${p[1]}</div>
-                <div class="price-tag">${p[2]} ريال</div>
-                <a href="https://ahmed714718761-stack.github.io/product-details.html?p=${pData}" class="btn-act btn-info">التفاصيل</a>
-                <button class="btn-act btn-add" onclick="addToCart('${p[1]}', ${p[2]})">إضافة</button>
+                <div class="p-price">${p[2]} ريال</div>
+                <a href="https://ahmed714718761-stack.github.io/product-details.html?p=${pData}" class="btn-act" style="background:#f0f7ff; color:var(--main); border:1px solid var(--main);">تفاصيل</a>
+                <button class="btn-act" style="background:var(--main); color:white;" onclick="addToCart('${p[1]}', ${p[2]})">إضافة</button>
             </div>`;
         }).join('');
     }
 
-    // وظائف السلة
     function addToCart(n, p) { cart.push({n, p, id: Date.now()}); updateCart(); }
     function updateCart() {
         document.getElementById('cart-num').innerText = cart.length;
-        document.getElementById('cart-list').innerHTML = cart.map(i => `
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        document.getElementById('cart-items-list').innerHTML = cart.map(i => `
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #f9f9f9; padding-bottom:5px;">
                 <span style="font-size:12px;">${i.n}</span>
                 <i class="fa fa-trash" style="color:red; cursor:pointer;" onclick="removeItem(${i.id})"></i>
             </div>`).join('');
@@ -189,7 +181,6 @@
     function openCart() { if(cart.length) document.getElementById('cartModal').style.display='flex'; else alert("السلة فارغة"); }
     function closeCart() { document.getElementById('cartModal').style.display='none'; }
 
-    // البحث والفلترة
     function search() {
         const val = document.getElementById('searchInput').value.toLowerCase();
         display(db.filter(p => p[1].toLowerCase().includes(val)));
@@ -200,7 +191,6 @@
         display(c === 'الكل' ? db : db.filter(p => p[3] === c));
     }
 
-    // تسجيل الدخول والتعليق
     function onSignIn(response) {
         const payload = JSON.parse(atob(response.credential.split('.')[1]));
         user = payload.name;
@@ -229,4 +219,3 @@
 </script>
 </body>
 </html>
-
