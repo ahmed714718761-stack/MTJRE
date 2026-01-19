@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم MTJRE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --main: #0055ff; --red: #ff4757; }
+        body { font-family: 'Cairo'; background: #f4f7fa; margin: 0; }
+        .tabs { display: flex; background: #fff; overflow-x: auto; sticky; top: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; min-width: 100px; font-weight: bold; }
+        .tab.active { border-bottom: 4px solid var(--main); color: var(--main); }
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        .card { display: none; background: #fff; padding: 20px; border-radius: 12px; }
+        .card.active { display: block; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: 'Cairo'; }
+        button { width: 100%; padding: 12px; background: var(--main); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .list-item { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .del { background: var(--red); width: auto; padding: 5px 10px; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+<div class="tabs">
+    <div class="tab active" onclick="showTab('orders', this)">الطلبات</div>
+    <div class="tab" onclick="showTab('products', this)">المنتجات</div>
+    <div class="tab" onclick="showTab('users', this)">العملاء</div>
+    <div class="tab" onclick="showTab('settings', this)">الاعدادات</div>
+</div>
+
+<div class="container">
+    <div id="orders" class="card active"><h3>📋 الطلبات الواردة</h3><div id="orderList"></div></div>
+    
+    <div id="products" class="card">
+        <h3>📦 أضف منتج</h3>
+        <input type="file" id="pImg">
+        <input type="text" id="pCode" placeholder="رقم المنتج">
+        <input type="text" id="pName" placeholder="الاسم">
+        <input type="number" id="pNew" placeholder="السعر الجديد">
+        <input type="number" id="pOld" placeholder="السعر القديم">
+        <textarea id="pDesc" placeholder="الوصف"></textarea>
+        <button onclick="saveP()">حفظ</button>
+        <div id="pList" style="margin-top:20px"></div>
+    </div>
+
+    <div id="users" class="card"><h3>👥 العملاء المسجلين</h3><div id="userList"></div></div>
+
+    <div id="settings" class="card">
+        <h3>⚙️ إعدادات المتجر</h3>
+        <input type="text" id="sLogo" placeholder="رابط اللوجو">
+        <input type="text" id="sPhone" placeholder="رقم الواتساب">
+        <input type="text" id="sAddr" placeholder="العنوان">
+        <input type="text" id="sNews" placeholder="شريط الأخبار">
+        <button onclick="updateSettings()">تحديث</button>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'ضع_رابط_السكربت_هنا';
+
+    async function load() {
+        const r = await fetch(SCRIPT_URL); const d = await r.json();
+        // عرض الطلبات
+        document.getElementById('orderList').innerHTML = d.orders.slice(1).reverse().map(o => `
+            <div class="list-item"><div><b>${o[0]}</b> - ${o[2]}<br><small>${o[5]}</small></div><button class="del" onclick="del('الطلبات','${o[0]}')">حذف</button></div>`).join('');
+        // عرض المنتجات
+        document.getElementById('pList').innerHTML = d.products.slice(1).map(p => `
+            <div class="list-item"><span>${p[1]}</span><button class="del" onclick="del('المنتجات','${p[0]}')">حذف</button></div>`).join('');
+        // عرض العملاء
+        document.getElementById('userList').innerHTML = d.users.slice(1).map(u => `
+            <div class="list-item"><span>${u[1]} (${u[2]})</span></div>`).join('');
+        // الإعدادات
+        document.getElementById('sLogo').value=d.settings[1][1]; document.getElementById('sPhone').value=d.settings[3][1];
+        document.getElementById('sAddr').value=d.settings[4][1]; document.getElementById('sNews').value=d.settings[7][1];
+    }
+
+    async function saveP() {
+        const f = document.getElementById('pImg').files[0];
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            await send({ action:"add", sheetName:"المنتجات", image:reader.result.split(',')[1], mimeType:f.type, fileName:f.name,
+                rowData:[Date.now(), document.getElementById('pName').value, document.getElementById('pNew').value, "عام", "AUTO_IMAGE", "متاح", "0", document.getElementById('pDesc').value, document.getElementById('pOld').value, document.getElementById('pCode').value] });
+        }; reader.readAsDataURL(f);
+    }
+
+    async function updateSettings() {
+        await send({ action:"update_settings", sheetName:"الاعدادات", logo:document.getElementById('sLogo').value, phone:document.getElementById('sPhone').value, address:document.getElementById('sAddr').value, news:document.getElementById('sNews').value });
+    }
+
+    async function del(s, id) { if(confirm("حذف؟")) await send({action:"delete", sheetName:s, id:id}); }
+    async function send(p) { await fetch(SCRIPT_URL,{method:'POST', body:JSON.stringify(p)}); location.reload(); }
+    function showTab(id, b) { document.querySelectorAll('.card').forEach(c=>c.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); b.classList.add('active'); }
+    window.onload = load;
+</script>
+</body>
+</html>
