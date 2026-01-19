@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر MTJRE المتكامل</title>
+    <title>متجري MTJRE المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -117,7 +117,7 @@
         <div style="display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;">
             <span>الإجمالي:</span><span id="total-price">0 ريال</span>
         </div>
-        <button onclick="sendWA()" style="width:100%; background:#22c55e; color:white; border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold; font-family:'Cairo';">إتمام الطلب (واتساب)</button>
+        <button onclick="checkout()" style="width:100%; background:#22c55e; color:white; border:none; padding:12px; border-radius:10px; margin-top:15px; font-weight:bold; font-family:'Cairo';">إتمام الطلب وتسجيل الفاتورة</button>
         <button onclick="closeCart()" style="width:100%; background:#eee; padding:10px; border-radius:10px; margin-top:8px; border:none; font-family:'Cairo';">إغلاق</button>
     </div>
 </div>
@@ -154,10 +154,11 @@
 </footer>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyY7sB1xbgypkQrJ-qOvoq3WLGIcZ5VjB49c8mVUhvWdvej15JxQe8PKBl1IBDlRh-Vaw/exec';
+    // الرابط الخاص بالسكربت المحدث
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeSqMhrqa7KYSqgWiprPPKWvD-CikAW8I0PKMshDISW8ypp63hvUtWYkVoUogHlcADgw/exec';
     let db = [], cart = [], currentUser = null;
+    let whatsappNumber = ""; // سيتم جلبه من الإعدادات
 
-    // إصلاح مشكلة ظهور المربعات في الأسماء العربية
     function decodeJwtResponse(token) {
         let base64Url = token.split('.')[1];
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -167,15 +168,69 @@
         return JSON.parse(jsonPayload);
     }
 
+    // --- التعديل المطلب: تسجيل الدخول ---
     function onSignIn(response) {
         const payload = decodeJwtResponse(response.credential);
         currentUser = { name: payload.name, email: payload.email };
         
         document.getElementById('user-info').innerText = "أهلاً، " + currentUser.name;
+        
+        // تسجيل العميل في القاعدة آلياً
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors',
+            body: JSON.stringify({ 
+                action: "register_user", 
+                name: currentUser.name, 
+                email: currentUser.email, 
+                sheetName: "العملاء" 
+            }) 
+        });
+
         document.getElementById('auth-area').innerHTML = `
             <textarea id="user-msg" placeholder="اكتب رأيك بالمتجر هنا..." rows="3" style="width:100%; border-radius:10px; padding:10px; font-family:'Cairo'; border:1px solid #ddd;"></textarea>
             <button onclick="postComment()" style="width:100%; background:var(--main); color:white; border:none; padding:12px; border-radius:10px; margin-top:5px; font-family:'Cairo'; font-weight:bold; cursor:pointer;">إرسال التعليق</button>
         `;
+    }
+
+    // --- التعديل المطلوب: إتمام الطلب ---
+    async function checkout() {
+        if (!currentUser) {
+            alert("يرجى تسجيل الدخول أولاً لإتمام الطلب.");
+            return;
+        }
+
+        const addr = prompt("يرجى إدخال عنوان التوصيل بالتفصيل:");
+        const phone = prompt("يرجى إدخال رقم الهاتف للتواصل:");
+        if(!addr || !phone) return;
+
+        const itemsNames = cart.map(i => i.n).join(', ');
+        const totalAmount = document.getElementById('total-price').innerText;
+
+        // إرسال الطلب لقاعدة البيانات
+        try {
+            const response = await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({
+                    action: "place_order", 
+                    sheetName: "الطلبات", 
+                    customerName: currentUser.name,
+                    customerPhone: phone, 
+                    customerAddr: addr, 
+                    items: itemsNames, 
+                    total: totalAmount
+                }) 
+            });
+            
+            const invId = await response.text();
+            alert("تم تسجيل طلبك بنجاح برقم فاتورة: " + invId);
+            
+            // التوجه للواتساب
+            const waMsg = `طلب جديد من المتجر\nرقم الفاتورة: ${invId}\nالعميل: ${currentUser.name}\nالهاتف: ${phone}\nالعنوان: ${addr}\nالمنتجات: ${itemsNames}\nالإجمالي: ${totalAmount}`;
+            window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMsg)}`;
+        } catch (error) {
+            alert("حدث خطأ أثناء حفظ الطلب، يرجى المحاولة لاحقاً.");
+        }
     }
 
     async function init() {
@@ -183,10 +238,12 @@
             const res = await fetch(SCRIPT_URL);
             const data = await res.json();
             db = data.products.slice(1);
+            whatsappNumber = data.settings[3][1];
+            
             document.getElementById('logo').src = data.settings[1][1];
             document.getElementById('ticker-text').innerText = data.settings[7][1];
             document.getElementById('f-address').innerText = data.settings[4][1];
-            document.getElementById('f-contact').innerText = "عبر الواتساب: " + data.settings[3][1];
+            document.getElementById('f-contact').innerText = "عبر الواتساب: " + whatsappNumber;
 
             document.getElementById('slider-container').innerHTML = data.banners.slice(1).map((b, i) => `
                 <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')">
@@ -198,7 +255,7 @@
             document.getElementById('comments-list').innerHTML = data.comments.slice(1).reverse().slice(0, 5).map(c => `<div class="comment-item"><b style="font-size:12px;">${c[0]} ✅</b><p style="margin:5px 0 0; font-size:12px;">${c[1]}</p></div>`).join('');
 
             display(db);
-        } catch(e) { console.log("Check SCRIPT_URL"); }
+        } catch(e) { console.log("Init Error"); }
 
         setInterval(() => {
             let active = document.querySelector('.slide.active');
@@ -223,8 +280,13 @@
     async function postComment() {
         const msg = document.getElementById('user-msg').value;
         if(!msg) return;
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'add_comment', name: currentUser.name, comment: msg }) });
-        alert("تم استلام تعليقك بنجاح!"); location.reload();
+        await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors',
+            body: JSON.stringify({ action: 'add_comment', name: currentUser.name, comment: msg }) 
+        });
+        alert("تم استلام تعليقك بنجاح!"); 
+        location.reload();
     }
 
     function addToCart(n, p) { cart.push({n, p, id: Date.now()}); updateUI(); }
@@ -236,12 +298,7 @@
     function remove(id) { cart = cart.filter(i => i.id !== id); updateUI(); }
     function openCart() { if(cart.length > 0) document.getElementById('cartModal').style.display = 'flex'; else alert("سلتك خالية حالياً"); }
     function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
-    function sendWA() {
-        let msg = "طلب جديد من المتجر:\n";
-        cart.forEach((i, idx) => msg += `${idx+1}. ${i.n}\n`);
-        msg += "الإجمالي: " + document.getElementById('total-price').innerText;
-        window.location.href = `https://wa.me/967774548481?text=${encodeURIComponent(msg)}`;
-    }
+    
     function searchFunc() {
         const val = document.getElementById('searchInp').value.toLowerCase();
         display(db.filter(p => p[1].toLowerCase().includes(val)));
