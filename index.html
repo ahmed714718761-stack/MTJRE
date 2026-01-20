@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر MTJRE المتكامل</title>
+    <title>متجري MTJRE المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -163,27 +163,45 @@
     }
 
     async function init() {
+    try {
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
-        db = data.products.slice(1);
-        waNum = data.settings[3][1];
         
-        document.getElementById('logo').src = data.settings[1][1];
-        document.getElementById('ticker-text').innerText = data.settings[7][1];
-        document.getElementById('f-address').innerText = data.settings[4][1];
-        document.getElementById('f-contact').innerText = "واتساب: " + waNum;
+        // جلب المنتجات وتصفيتها من الصفوف الفارغة
+        db = data.products ? data.products.slice(1).filter(p => p[1]) : [];
+        
+        // جلب الإعدادات (اللوجو، الواتساب، العنوان، شريط الأخبار)
+        if (data.settings && data.settings.length > 1) {
+            document.getElementById('logo').src = data.settings[1][1] || "";
+            waNum = data.settings[3][1] || "";
+            document.getElementById('ticker-text').innerText = data.settings[7][1] || "أهلاً بكم في متجرنا";
+            document.getElementById('f-address').innerText = data.settings[4][1] || "";
+            document.getElementById('f-contact').innerText = "واتساب: " + waNum;
+        }
 
-        document.getElementById('slider-container').innerHTML = data.banners.slice(1).map((b, i) => `
-            <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')"><div class="promo-badge">${b[1]}</div></div>`).join('');
+        // جلب البنرات
+        if (data.banners && data.banners.length > 1) {
+            document.getElementById('slider-container').innerHTML = data.banners.slice(1).map((b, i) => `
+                <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')"><div class="promo-badge">${b[1]}</div></div>`).join('');
+        }
             
-        document.getElementById('wallets-list').innerHTML = data.wallets.slice(1).map(w => `<div class="wallet-card"><i class="fa fa-wallet"></i> ${w[0]}: ${w[1]}</div>`).join('');
+        // جلب المحافظ
+        if (data.wallets) {
+            document.getElementById('wallets-list').innerHTML = data.wallets.slice(1).map(w => `<div class="wallet-card"><i class="fa fa-wallet"></i> ${w[0]}: ${w[1]}</div>`).join('');
+        }
         
+        // إنشاء الأقسام
         const cats = ['الكل', ...new Set(db.map(p => p[3]))];
         document.getElementById('cats-bar').innerHTML = cats.map(c => `<div class="cat-item ${c==='الكل'?'active':''}" onclick="filter('${c}', this)">${c}</div>`).join('');
         
         display(db);
         startSlider();
+    } catch(e) {
+        console.error("خطأ في جلب البيانات: ", e);
+        document.getElementById('products-grid').innerHTML = "<p style='text-align:center; padding:20px;'>جاري تحميل المنتجات أو تأكد من إعدادات السكربت...</p>";
     }
+}
+
 
     function display(items) {
         document.getElementById('products-grid').innerHTML = items.map(p => `
@@ -209,3 +227,4 @@
 </script>
 </body>
 </html>
+
