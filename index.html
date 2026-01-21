@@ -9,69 +9,70 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root { --main: #0055ff; --bg: #f4f7fa; --red: #ff3b3b; --dark: #1e293b; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; color: var(--dark); overflow-x: hidden; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; text-align: right; color: var(--dark); }
         
-        /* شريط الأخبار */
+        /* شريط الأخبار المحدث */
         .news-ticker { background: var(--main); color: white; padding: 10px 0; overflow: hidden; position: relative; font-size: 14px; font-weight: bold; }
-        .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 30s linear infinite; }
-        @keyframes ticker { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; padding-right: 100%; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
         /* الهيدر */
         header { background: white; padding: 15px 5%; box-shadow: 0 2px 15px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        #logo { height: 50px; object-fit: contain; }
-        
-        .nav-btns { display: flex; gap: 8px; align-items: center; }
-        .btn-nav { text-decoration: none; padding: 6px 15px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.3s; border: none; }
+        #logo { height: 50px; max-width: 150px; object-fit: contain; }
+        .nav-btns { display: flex; gap: 8px; }
+        .btn-nav { text-decoration: none; padding: 6px 15px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; border: none; font-family: 'Cairo'; }
         .btn-admin { background: var(--dark); color: white; }
         .btn-about { background: #f1f5f9; color: var(--dark); border: 1px solid #ddd; }
 
         .search-bar { position: relative; width: 100%; }
-        .search-bar input { width: 100%; padding: 12px 45px 12px 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: 'Cairo'; outline: none; box-sizing: border-box; }
+        .search-bar input { width: 100%; padding: 12px 45px 12px 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: 'Cairo'; outline: none; }
         .search-bar i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
 
-        /* السلايدر والأقسام */
-        .slider-box { width: 90%; margin: 20px auto; height: 180px; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        /* السلايدر */
+        .slider-box { width: 92%; margin: 15px auto; height: 160px; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .slide { width: 100%; height: 100%; background-size: cover; background-position: center; display: none; }
-        .slide.active { display: block; }
-        
-        .cats-container { display: flex; gap: 10px; overflow-x: auto; padding: 15px 5%; white-space: nowrap; scrollbar-width: none; }
-        .cat-item { background: white; padding: 8px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .slide.active { display: block; transition: 0.5s; }
+
+        /* الأقسام */
+        .cats-container { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5%; white-space: nowrap; scrollbar-width: none; }
+        .cat-item { background: white; padding: 8px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 13px; }
         .cat-item.active { background: var(--main); color: white; }
 
         /* شبكة المنتجات */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; }
-        .p-card { background: white; border-radius: 15px; padding: 10px; text-align: center; position: relative; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .p-card:hover { transform: translateY(-5px); }
-        .p-img { width: 100%; height: 90px; object-fit: contain; margin-bottom: 8px; }
-        .p-name { font-size: 11px; font-weight: bold; height: 32px; overflow: hidden; margin-bottom: 5px; }
-        .p-price { color: var(--main); font-weight: 900; font-size: 13px; display: block; }
-        .btn-add { background: var(--main); color: white; border: none; width: 100%; padding: 8px; border-radius: 8px; margin-top: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+        @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        .p-card { background: white; border-radius: 15px; padding: 12px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s; border: 1px solid #eee; }
+        .p-img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; }
+        .p-name { font-size: 13px; font-weight: bold; height: 38px; overflow: hidden; line-height: 1.4; margin-bottom: 5px; color: var(--dark); }
+        .p-price { color: var(--main); font-weight: 900; font-size: 14px; display: block; margin-bottom: 8px; }
+        .btn-add { background: var(--main); color: white; border: none; width: 100%; padding: 10px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; }
 
-        /* سلة المشتريات */
-        .cart-float { position: fixed; bottom: 30px; left: 20px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 25px; z-index: 2000; box-shadow: 0 8px 25px rgba(0,85,255,0.4); cursor: pointer; }
+        /* السلة */
+        .cart-float { position: fixed; bottom: 25px; left: 20px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 25px; z-index: 2000; box-shadow: 0 8px 25px rgba(0,85,255,0.4); cursor: pointer; }
         .cart-badge { position: absolute; top: 0; right: 0; background: var(--red); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
 
-        /* المودال (النافذة المنبثقة) */
+        /* المودال */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 25px; padding: 25px; position: relative; }
-
-        footer { background: var(--dark); color: white; padding: 30px 5% 100px; text-align: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 25px; padding: 25px; text-align: center; }
+        
+        footer { background: var(--dark); color: white; padding: 30px 5% 100px; text-align: center; font-size: 13px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<div class="news-ticker"><div id="ticker-text" class="ticker-content">جاري تحميل الأخبار...</div></div>
+<div class="news-ticker"><div id="ticker-text" class="ticker-content">أهلاً بكم في متجرنا... جاري جلب أحدث العروض...</div></div>
 
 <header>
     <div class="nav-top">
-        <img id="logo" src="" alt="لوجو المتجر">
+        <img id="logo" src="https://i.ibb.co/xKt7f30s/image.png" alt="لوجو">
         <div class="nav-btns">
             <a href="admin.html" class="btn-nav btn-admin"><i class="fa fa-lock"></i> الإدارة</a>
-            <button class="btn-nav btn-about" onclick="alert('متجرنا يقدم أفضل المنتجات بأقل الأسعار!')">عنا</button>
+            <button class="btn-nav btn-about" onclick="alert('متجرنا يوفر لكم أفضل المنتجات بأفضل الأسعار في اليمن.')">من نحن</button>
         </div>
     </div>
-    <div style="text-align: center; margin-bottom: 8px;"><span id="user-info" style="font-size: 12px; font-weight: bold; color: var(--main);"></span></div>
+    <div id="user-display" style="text-align: center; margin-bottom: 8px; font-size: 12px; color: var(--main); font-weight: bold;"></div>
     <div class="search-bar">
         <i class="fa fa-search"></i>
         <input type="text" id="searchInp" placeholder="ابحث عن منتج..." onkeyup="searchFunc()">
@@ -82,42 +83,45 @@
 <div id="cats-bar" class="cats-container"></div>
 
 <div id="products-grid" class="grid">
-    <p style="grid-column: 1/-1; text-align: center; padding: 50px; color: #888;">جاري تحميل المنتجات...</p>
+    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+        <i class="fa fa-spinner fa-spin" style="font-size: 30px; color: var(--main);"></i>
+        <p>جاري تحميل المنتجات العربية...</p>
+    </div>
 </div>
 
 <div class="cart-float" onclick="openCart()">
-    <i class="fa fa-shopping-cart"></i>
+    <i class="fa fa-shopping-basket"></i>
     <span id="cart-num" class="cart-badge">0</span>
 </div>
 
 <div id="cartModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0">🛒 سلتك</h3>
-        <div id="cart-list-items" style="max-height: 200px; overflow-y: auto;"></div>
-        <hr>
-        <div style="display:flex; justify-content:space-between; font-weight:bold;">
+        <h3>🛒 سلة المشتريات</h3>
+        <div id="cart-items-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size: 18px; margin-bottom: 15px;">
             <span>الإجمالي:</span><span id="total-price" style="color:var(--main)">0 ريال</span>
         </div>
-        <button onclick="checkout()" style="width:100%; background:#22c55e; color:white; border:none; padding:12px; border-radius:12px; margin-top:15px; font-weight:bold; font-family:'Cairo'; cursor:pointer;">إرسال الطلب عبر واتساب</button>
-        <button onclick="closeCart()" style="width:100%; background:#eee; padding:10px; border-radius:12px; margin-top:8px; border:none; font-family:'Cairo'; cursor:pointer;">إغلاق</button>
+        <button onclick="checkout()" style="width:100%; background:#22c55e; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; font-family:'Cairo'; cursor:pointer; font-size: 16px;">إتمام الطلب عبر واتساب</button>
+        <button onclick="closeCart()" style="width:100%; background:#eee; padding:10px; border-radius:12px; margin-top:10px; border:none; font-family:'Cairo'; cursor:pointer;">إغلاق</button>
     </div>
 </div>
 
-<div style="padding: 20px; text-align: center; background: white; margin: 20px 5%; border-radius: 15px;">
-    <h4 style="margin: 0 0 10px 0;">سجل دخولك للطلب</h4>
+<div style="padding: 20px; text-align: center; background: white; margin: 20px 5%; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    <h4 style="margin: 0 0 15px 0;">سجل دخولك لتتمكن من الطلب</h4>
     <div id="g_id_onload" data-client_id="923000367565-2scjbaaiuvqjad8fsts4c2l9ot77l4v9.apps.googleusercontent.com" data-callback="onSignIn"></div>
     <div class="g_id_signin" data-type="standard"></div>
 </div>
 
 <footer>
     <p id="f-address"></p>
-    <div id="wallets-list"></div>
-    <p>© 2026 جميع الحقوق محفوظة لمتجر MTJRE</p>
+    <p id="f-phone"></p>
+    <p>© 2026 متجر MTJRE - جميع الحقوق محفوظة</p>
 </footer>
 
 <script>
-    // ضع رابط السكربت الجديد هنا
+    // هام: ضع رابط السكربت (Exec URL) الخاص بك هنا
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuvSYTBa_4iP5uzks791_pQsKuVq90ylxDcH2DLpmbNODGcABAoXVBEz10Nl8IIgVIjw/exec'; 
+    
     let db = [], cart = [], currentUser = null, waNum = "";
 
     async function init() {
@@ -125,93 +129,113 @@
             const res = await fetch(SCRIPT_URL);
             const data = await res.json();
             
-            db = data.products.slice(1).filter(p => p[1]); // تصفية الصفوف الفارغة
+            // جلب المنتجات (تجنب الصفوف الفارغة)
+            db = data.products.slice(1).filter(p => p[1]);
             waNum = data.settings[3][1];
             
-            // تحديث الواجهة
-            document.getElementById('logo').src = data.settings[1][1];
-            document.getElementById('ticker-text').innerText = data.settings[7][1];
-            document.getElementById('f-address').innerText = "📍 " + data.settings[4][1];
+            // تحديث الإعدادات
+            if(data.settings[1][1]) document.getElementById('logo').src = data.settings[1][1];
+            document.getElementById('ticker-text').innerText = data.settings[7][1] || "مرحباً بكم في متجرنا";
+            document.getElementById('f-address').innerText = "📍 " + (data.settings[4][1] || "اليمن");
+            document.getElementById('f-phone').innerText = "📞 واتساب: " + waNum;
 
             // السلايدر
-            document.getElementById('slider-container').innerHTML = data.banners.slice(1).map((b, i) => `
-                <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')"></div>`).join('');
+            if(data.banners && data.banners.length > 1) {
+                document.getElementById('slider-container').innerHTML = data.banners.slice(1).map((b, i) => `
+                    <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')"></div>`).join('');
+                startSlider();
+            }
             
             // الأقسام
             const cats = ['الكل', ...new Set(db.map(p => p[3]))];
             document.getElementById('cats-bar').innerHTML = cats.map(c => `<div class="cat-item ${c==='الكل'?'active':''}" onclick="filter('${c}', this)">${c}</div>`).join('');
             
             display(db);
-            startSlider();
         } catch (e) {
-            document.getElementById('products-grid').innerHTML = "<p>فشل تحميل البيانات. تأكد من اتصالك ورابط السكربت.</p>";
+            document.getElementById('products-grid').innerHTML = "<p style='padding:20px;'>خطأ في الاتصال بالسكربت. تأكد من نشر السكربت بشكل صحيح (Anyone).</p>";
         }
     }
 
     function display(items) {
         const grid = document.getElementById('products-grid');
-        if(items.length === 0) {
-            grid.innerHTML = "<p>لا توجد منتجات حالياً.</p>";
-            return;
-        }
+        if(items.length === 0) { grid.innerHTML = "<p>لا توجد منتجات متوفرة حالياً.</p>"; return; }
+        
         grid.innerHTML = items.map(p => `
             <div class="p-card">
-                <img src="${p[4]}" class="p-img" onerror="this.src='https://via.placeholder.com/100'">
+                <img src="${p[4] || 'https://via.placeholder.com/150'}" class="p-img" onerror="this.src='https://via.placeholder.com/150'">
                 <div class="p-name">${p[1]}</div>
                 <span class="p-price">${p[2]} ريال</span>
-                <button class="btn-add" onclick="addToCart('${p[1]}', ${p[2]})">إضافة للسلة</button>
+                <button class="btn-add" onclick="addToCart('${p[1]}', ${p[2]})"><i class="fa fa-cart-plus"></i> إضافة للسلة</button>
             </div>`).join('');
     }
 
     function addToCart(name, price) {
         cart.push({name, price});
-        updateCartUI();
+        updateCart();
+        // تنبيه بسيط عند الإضافة
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "تمت الإضافة ✅";
+        setTimeout(() => btn.innerHTML = originalText, 1000);
     }
 
-    function updateCartUI() {
+    function updateCart() {
         document.getElementById('cart-num').innerText = cart.length;
         document.getElementById('total-price').innerText = cart.reduce((s, i) => s + i.price, 0) + " ريال";
-        document.getElementById('cart-list-items').innerHTML = cart.map((i, idx) => `
-            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; background:#f9f9f9; padding:5px; border-radius:5px;">
-                <span>${i.name}</span>
-                <b style="color:var(--red); cursor:pointer;" onclick="removeItem(${idx})">❌</b>
+        document.getElementById('cart-items-list').innerHTML = cart.map((item, index) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; font-size:13px;">
+                <span>${item.name}</span>
+                <span><b>${item.price} ريال</b> <i class="fa fa-trash" style="color:red; cursor:pointer; margin-right:10px;" onclick="removeItem(${index})"></i></span>
             </div>`).join('');
     }
 
     function removeItem(idx) {
         cart.splice(idx, 1);
-        updateCartUI();
+        updateCart();
     }
 
     function onSignIn(response) {
         const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
         currentUser = payload;
-        document.getElementById('user-info').innerText = "مرحباً، " + payload.name;
+        document.getElementById('user-display').innerText = "أهلاً بك يا " + payload.name;
     }
 
     function checkout() {
-        if (!currentUser) return alert("يرجى تسجيل الدخول أولاً باستخدام جوجل");
-        if (cart.length === 0) return alert("السلة فارغة!");
+        if (!currentUser) return alert("فضلاً، سجل دخولك بحساب جوجل أولاً لتتمكن من إرسال الطلب.");
+        if (cart.length === 0) return alert("سلة المشتريات فارغة!");
         
-        const itemsMsg = cart.map(i => i.name).join(', ');
+        const itemsList = cart.map(i => "- " + i.name).join('\n');
         const total = document.getElementById('total-price').innerText;
-        const msg = `طلب جديد\nالعميل: ${currentUser.name}\nالمنتجات: ${itemsMsg}\nالإجمالي: ${total}`;
+        const whatsappMsg = `طلب جديد من: ${currentUser.name}\n\nالمنتجات:\n${itemsList}\n\nالإجمالي: ${total}`;
         
-        window.location.href = `https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`;
+        window.location.href = `https://wa.me/${waNum}?text=${encodeURIComponent(whatsappMsg)}`;
     }
 
     function openCart() { document.getElementById('cartModal').style.display = 'flex'; }
     function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
-    function startSlider() { setInterval(() => { let a = document.querySelector('.slide.active'); if(!a) return; let n = a.nextElementSibling || document.querySelector('.slide'); a.classList.remove('active'); n.classList.add('active'); }, 4000); }
-    function searchFunc() { const val = document.getElementById('searchInp').value.toLowerCase(); display(db.filter(p => p[1].toLowerCase().includes(val))); }
-    function filter(c, el) { 
-        document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); 
-        el.classList.add('active'); 
-        display(c === 'الكل' ? db : db.filter(p => p[3] === c)); 
+    
+    function startSlider() { 
+        setInterval(() => { 
+            let active = document.querySelector('.slide.active');
+            if(!active) return;
+            let next = active.nextElementSibling || document.querySelector('.slide');
+            active.classList.remove('active');
+            next.classList.add('active');
+        }, 4000); 
+    }
+
+    function searchFunc() {
+        const query = document.getElementById('searchInp').value.toLowerCase();
+        display(db.filter(p => p[1].toLowerCase().includes(query)));
+    }
+
+    function filter(cat, el) {
+        document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        display(cat === 'الكل' ? db : db.filter(p => p[3] === cat));
     }
 
     window.onload = init;
 </script>
 </body>
 </html>
-
