@@ -2,94 +2,200 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم MTJRE</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main: #0055ff; --red: #ff4757; }
-        body { font-family: 'Cairo'; background: #f4f7fa; margin: 0; }
-        .tabs { display: flex; background: #fff; overflow-x: auto; sticky; top: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; min-width: 100px; font-weight: bold; }
-        .tab.active { border-bottom: 4px solid var(--main); color: var(--main); }
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-        .card { display: none; background: #fff; padding: 20px; border-radius: 12px; }
-        .card.active { display: block; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: 'Cairo'; }
-        button { width: 100%; padding: 12px; background: var(--main); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .list-item { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .del { background: var(--red); width: auto; padding: 5px 10px; font-size: 11px; }
+        :root { --main: #0055ff; --bg: #f0f2f5; --dark: #1e293b; --white: #ffffff; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; }
+        header { background: var(--dark); color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 20px; }
+        
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-card i { font-size: 30px; color: var(--main); margin-bottom: 10px; }
+        .stat-card h3 { margin: 5px 0; font-size: 24px; }
+        .stat-card p { margin: 0; color: #64748b; font-size: 14px; }
+
+        .section-title { margin: 30px 0 15px; font-weight: bold; border-right: 5px solid var(--main); padding-right: 15px; }
+        
+        .table-wrapper { background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+        th { background: #f8fafc; color: #64748b; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; }
+        .status-pending { background: #fff7ed; color: #c2410c; }
+        
+        .tab-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .tab-btn { background: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; white-space: nowrap; }
+        .tab-btn.active { background: var(--main); color: white; }
+
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
     </style>
 </head>
 <body>
 
-<div class="tabs">
-    <div class="tab active" onclick="showTab('orders', this)">الطلبات</div>
-    <div class="tab" onclick="showTab('products', this)">المنتجات</div>
-    <div class="tab" onclick="showTab('users', this)">العملاء</div>
-    <div class="tab" onclick="showTab('settings', this)">الاعدادات</div>
+<div id="loading-overlay">
+    <i class="fa fa-spinner fa-spin" style="font-size: 50px; color: var(--main);"></i>
+    <p>جاري جلب بيانات متجرك...</p>
 </div>
 
+<header>
+    <i class="fa fa-gauge-high"></i> لوحة تحكم متجر MTJRE
+</header>
+
 <div class="container">
-    <div id="orders" class="card active"><h3>📋 الطلبات الواردة</h3><div id="orderList"></div></div>
-    
-    <div id="products" class="card">
-        <h3>📦 أضف منتج</h3>
-        <input type="file" id="pImg">
-        <input type="text" id="pCode" placeholder="رقم المنتج">
-        <input type="text" id="pName" placeholder="الاسم">
-        <input type="number" id="pNew" placeholder="السعر الجديد">
-        <input type="number" id="pOld" placeholder="السعر القديم">
-        <textarea id="pDesc" placeholder="الوصف"></textarea>
-        <button onclick="saveP()">حفظ</button>
-        <div id="pList" style="margin-top:20px"></div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fa fa-shopping-cart"></i>
+            <h3 id="count-orders">0</h3>
+            <p>إجمالي الطلبات</p>
+        </div>
+        <div class="stat-card">
+            <i class="fa fa-users"></i>
+            <h3 id="count-visitors">0</h3>
+            <p>عدد الزيارات</p>
+        </div>
+        <div class="stat-card">
+            <i class="fa fa-box"></i>
+            <h3 id="count-products">0</h3>
+            <p>المنتجات</p>
+        </div>
+        <div class="stat-card">
+            <i class="fa fa-comment"></i>
+            <h3 id="count-comments">0</h3>
+            <p>التعليقات</p>
+        </div>
     </div>
 
-    <div id="users" class="card"><h3>👥 العملاء المسجلين</h3><div id="userList"></div></div>
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="showTab('orders')">📦 الطلبات</button>
+        <button class="tab-btn" onclick="showTab('comments')">💬 التعليقات</button>
+        <button class="tab-btn" onclick="showTab('visitors')">📈 الزوار</button>
+    </div>
 
-    <div id="settings" class="card">
-        <h3>⚙️ إعدادات المتجر</h3>
-        <input type="text" id="sLogo" placeholder="رابط اللوجو">
-        <input type="text" id="sPhone" placeholder="رقم الواتساب">
-        <input type="text" id="sAddr" placeholder="العنوان">
-        <input type="text" id="sNews" placeholder="شريط الأخبار">
-        <button onclick="updateSettings()">تحديث</button>
+    <div id="sec-orders">
+        <h3 class="section-title">آخر الطلبات المستلمة</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>رقم الطلب</th>
+                        <th>العميل</th>
+                        <th>العنوان</th>
+                        <th>المنتجات</th>
+                        <th>الإجمالي</th>
+                        <th>التاريخ</th>
+                    </tr>
+                </thead>
+                <tbody id="table-orders"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="sec-comments" style="display:none">
+        <h3 class="section-title">تعليقات وآراء العملاء</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>التعليق</th>
+                        <th>التاريخ</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody id="table-comments"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="sec-visitors" style="display:none">
+        <h3 class="section-title">سجل الزيارات الأخير</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الصفحة</th>
+                        <th>الجهاز</th>
+                        <th>الموقع</th>
+                    </tr>
+                </thead>
+                <tbody id="table-visitors"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1fhx4cylmC4hU-awhCxxN-odbjRQgry2JTMfQ8SXw7sXKdNbKyYYH4KQ4MQOaHmR9NA/exec';
-    async function load() {
-        const r = await fetch(SCRIPT_URL); const d = await r.json();
-        // عرض الطلبات
-        document.getElementById('orderList').innerHTML = d.orders.slice(1).reverse().map(o => `
-            <div class="list-item"><div><b>${o[0]}</b> - ${o[2]}<br><small>${o[5]}</small></div><button class="del" onclick="del('الطلبات','${o[0]}')">حذف</button></div>`).join('');
-        // عرض المنتجات
-        document.getElementById('pList').innerHTML = d.products.slice(1).map(p => `
-            <div class="list-item"><span>${p[1]}</span><button class="del" onclick="del('المنتجات','${p[0]}')">حذف</button></div>`).join('');
-        // عرض العملاء
-        document.getElementById('userList').innerHTML = d.users.slice(1).map(u => `
-            <div class="list-item"><span>${u[1]} (${u[2]})</span></div>`).join('');
-        // الإعدادات
-        document.getElementById('sLogo').value=d.settings[1][1]; document.getElementById('sPhone').value=d.settings[3][1];
-        document.getElementById('sAddr').value=d.settings[4][1]; document.getElementById('sNews').value=d.settings[7][1];
+    // ضع رابط السكربت الخاص بك هنا (الذي ينتهي بـ /exec)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuvSYTBa_4iP5uzks791_pQsKuVq90ylxDcH2DLpmbNODGcABAoXVBEz10Nl8IIgVIjw/exec';
+
+    async function fetchData() {
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+            
+            // تحديث الأرقام في البطاقات
+            document.getElementById('count-orders').innerText = data.orders.length - 1;
+            document.getElementById('count-visitors').innerText = data.visitors.length - 1;
+            document.getElementById('count-products').innerText = data.products.length - 1;
+            document.getElementById('count-comments').innerText = data.comments.length - 1;
+
+            // تعبئة جدول الطلبات (بناءً على ملفك)
+            const ordersHtml = data.orders.slice(1).reverse().map(row => `
+                <tr>
+                    <td><b>${row[0]}</b></td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td style="font-size:11px">${row[3]}</td>
+                    <td style="color:var(--main); font-weight:bold">${row[4]}</td>
+                    <td>${row[5]}</td>
+                </tr>
+            `).join('');
+            document.getElementById('table-orders').innerHTML = ordersHtml;
+
+            // تعبئة جدول التعليقات (مثل تعليقات أروى وأحمد)
+            const commentsHtml = data.comments.slice(1).reverse().map(row => `
+                <tr>
+                    <td><b>${row[0]}</b></td>
+                    <td>${row[1]}</td>
+                    <td>${row[3]}</td>
+                    <td><span class="status-badge status-pending">${row[4] || 'جديد'}</span></td>
+                </tr>
+            `).join('');
+            document.getElementById('table-comments').innerHTML = commentsHtml;
+
+            // تعبئة جدول الزوار
+            const visitorsHtml = data.visitors.slice(1).reverse().map(row => `
+                <tr>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td>${row[3]}</td>
+                </tr>
+            `).join('');
+            document.getElementById('table-visitors').innerHTML = visitorsHtml;
+
+            document.getElementById('loading-overlay').style.display = 'none';
+        } catch (e) {
+            alert("خطأ في جلب البيانات، تأكد من رابط السكربت.");
+        }
     }
 
-    async function saveP() {
-        const f = document.getElementById('pImg').files[0];
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            await send({ action:"add", sheetName:"المنتجات", image:reader.result.split(',')[1], mimeType:f.type, fileName:f.name,
-                rowData:[Date.now(), document.getElementById('pName').value, document.getElementById('pNew').value, "عام", "AUTO_IMAGE", "متاح", "0", document.getElementById('pDesc').value, document.getElementById('pOld').value, document.getElementById('pCode').value] });
-        }; reader.readAsDataURL(f);
+    function showTab(tab) {
+        document.getElementById('sec-orders').style.display = tab === 'orders' ? 'block' : 'none';
+        document.getElementById('sec-comments').style.display = tab === 'comments' ? 'block' : 'none';
+        document.getElementById('sec-visitors').style.display = tab === 'visitors' ? 'block' : 'none';
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
     }
 
-    async function updateSettings() {
-        await send({ action:"update_settings", sheetName:"الاعدادات", logo:document.getElementById('sLogo').value, phone:document.getElementById('sPhone').value, address:document.getElementById('sAddr').value, news:document.getElementById('sNews').value });
-    }
-
-    async function del(s, id) { if(confirm("حذف؟")) await send({action:"delete", sheetName:s, id:id}); }
-    async function send(p) { await fetch(SCRIPT_URL,{method:'POST', body:JSON.stringify(p)}); location.reload(); }
-    function showTab(id, b) { document.querySelectorAll('.card').forEach(c=>c.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); b.classList.add('active'); }
-    window.onload = load;
+    window.onload = fetchData;
 </script>
 </body>
 </html>
