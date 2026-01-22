@@ -3,199 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم MTJRE</title>
+    <title>متجر MTJRE المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main: #0055ff; --bg: #f0f2f5; --dark: #1e293b; --white: #ffffff; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; }
-        header { background: var(--dark); color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 20px; }
+        :root { --main: #0055ff; --bg: #f4f7fa; --red: #ff3b3b; --dark: #1e293b; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; text-align: right; }
         
-        .container { padding: 20px; max-width: 1200px; margin: auto; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .stat-card i { font-size: 30px; color: var(--main); margin-bottom: 10px; }
-        .stat-card h3 { margin: 5px 0; font-size: 24px; }
-        .stat-card p { margin: 0; color: #64748b; font-size: 14px; }
+        /* شريط الأخبار */
+        .news-ticker { background: var(--main); color: white; padding: 10px 0; overflow: hidden; font-size: 14px; font-weight: bold; }
+        .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        .section-title { margin: 30px 0 15px; font-weight: bold; border-right: 5px solid var(--main); padding-right: 15px; }
-        
-        .table-wrapper { background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #edf2f7; font-size: 14px; }
-        th { background: #f8fafc; color: #64748b; }
-        
-        .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; }
-        .status-pending { background: #fff7ed; color: #c2410c; }
-        
-        .tab-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .tab-btn { background: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; white-space: nowrap; }
-        .tab-btn.active { background: var(--main); color: white; }
+        header { background: white; padding: 15px 5%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; }
+        #logo { height: 50px; object-fit: contain; }
 
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        .search-box { margin-top: 15px; position: relative; }
+        .search-box input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-family: 'Cairo'; }
+        .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+
+        /* الأقسام */
+        .cats { display: flex; gap: 10px; overflow-x: auto; padding: 15px 5%; scrollbar-width: none; }
+        .cat-item { background: white; padding: 8px 20px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .cat-item.active { background: var(--main); color: white; }
+
+        /* شبكة المنتجات */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 5% 30px; }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        
+        .p-card { background: white; border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #eee; transition: 0.3s; }
+        .p-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .p-img { width: 100%; height: 140px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; background: #f9f9f9; }
+        .p-name { font-size: 13px; font-weight: bold; height: 38px; overflow: hidden; color: var(--dark); margin-bottom: 8px; }
+        .p-price { color: var(--main); font-weight: 900; font-size: 16px; display: block; margin-bottom: 10px; }
+        .btn-add { background: var(--main); color: white; border: none; width: 100%; padding: 10px; border-radius: 12px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; }
+
+        /* السلة */
+        .cart-btn { position: fixed; bottom: 20px; left: 20px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(0,85,255,0.3); cursor: pointer; z-index: 1000; }
+        .badge { position: absolute; top: 0; right: 0; background: var(--red); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+
+        /* المودال */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 25px; padding: 20px; }
+        .input-group { margin-bottom: 10px; }
+        .input-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-family: 'Cairo'; outline: none; }
     </style>
 </head>
 <body>
 
-<div id="loading-overlay">
-    <i class="fa fa-spinner fa-spin" style="font-size: 50px; color: var(--main);"></i>
-    <p>جاري جلب بيانات متجرك...</p>
-</div>
+<div class="news-ticker"><div id="ticker-text" class="ticker-content">جاري جلب أحدث العروض والملابس...</div></div>
 
 <header>
-    <i class="fa fa-gauge-high"></i> لوحة تحكم متجر MTJRE
+    <div class="nav-top">
+        <img id="logo" src="https://i.ibb.co/xKt7f30s/image.png" alt="MTJRE">
+        <a href="admin.html" style="text-decoration: none; color: var(--dark); font-weight: bold; font-size: 13px;"><i class="fa fa-user-shield"></i> الإدارة</a>
+    </div>
+    <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInp" placeholder="ابحث عن الملابس أو المنتجات..." onkeyup="search()">
+    </div>
 </header>
 
-<div class="container">
-    <div class="stats-grid">
-        <div class="stat-card">
-            <i class="fa fa-shopping-cart"></i>
-            <h3 id="count-orders">0</h3>
-            <p>إجمالي الطلبات</p>
-        </div>
-        <div class="stat-card">
-            <i class="fa fa-users"></i>
-            <h3 id="count-visitors">0</h3>
-            <p>عدد الزيارات</p>
-        </div>
-        <div class="stat-card">
-            <i class="fa fa-box"></i>
-            <h3 id="count-products">0</h3>
-            <p>المنتجات</p>
-        </div>
-        <div class="stat-card">
-            <i class="fa fa-comment"></i>
-            <h3 id="count-comments">0</h3>
-            <p>التعليقات</p>
-        </div>
-    </div>
+<div id="cats-bar" class="cats">
+    <div class="cat-item active" onclick="filterCat('الكل', this)">الكل</div>
+</div>
 
-    <div class="tab-bar">
-        <button class="tab-btn active" onclick="showTab('orders')">📦 الطلبات</button>
-        <button class="tab-btn" onclick="showTab('comments')">💬 التعليقات</button>
-        <button class="tab-btn" onclick="showTab('visitors')">📈 الزوار</button>
+<div id="products-grid" class="grid">
+    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+        <i class="fa fa-spinner fa-spin" style="font-size: 30px; color: var(--main);"></i>
+        <p>جاري جلب المنتجات...</p>
     </div>
+</div>
 
-    <div id="sec-orders">
-        <h3 class="section-title">آخر الطلبات المستلمة</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>رقم الطلب</th>
-                        <th>العميل</th>
-                        <th>العنوان</th>
-                        <th>المنتجات</th>
-                        <th>الإجمالي</th>
-                        <th>التاريخ</th>
-                    </tr>
-                </thead>
-                <tbody id="table-orders"></tbody>
-            </table>
-        </div>
-    </div>
+<div class="cart-btn" onclick="openCart()">
+    <i class="fa fa-shopping-bag"></i>
+    <span id="cart-count" class="badge">0</span>
+</div>
 
-    <div id="sec-comments" style="display:none">
-        <h3 class="section-title">تعليقات وآراء العملاء</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>الاسم</th>
-                        <th>التعليق</th>
-                        <th>التاريخ</th>
-                        <th>الحالة</th>
-                    </tr>
-                </thead>
-                <tbody id="table-comments"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="sec-visitors" style="display:none">
-        <h3 class="section-title">سجل الزيارات الأخير</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>الصفحة</th>
-                        <th>الجهاز</th>
-                        <th>الموقع</th>
-                    </tr>
-                </thead>
-                <tbody id="table-visitors"></tbody>
-            </table>
-        </div>
+<div id="cartModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin: 0 0 15px 0;">🛒 إتمام الطلب</h3>
+        <div id="cart-items" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; font-size: 14px;"></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--main);">الإجمالي: <span id="total-price">0</span> ريال</div>
+        
+        <div class="input-group"><input type="text" id="custName" placeholder="الاسم الكامل"></div>
+        <div class="input-group"><input type="text" id="custAddr" placeholder="العنوان (المدينة - الشارع)"></div>
+        
+        <button onclick="sendOrder()" style="width: 100%; background: #22c55e; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; font-family: 'Cairo'; cursor: pointer;">تأكيد الطلب عبر واتساب</button>
+        <button onclick="closeCart()" style="width: 100%; background: #eee; border: none; padding: 10px; border-radius: 12px; margin-top: 10px; font-family: 'Cairo'; cursor: pointer;">إغلاق</button>
     </div>
 </div>
 
 <script>
-    // ضع رابط السكربت الخاص بك هنا (الذي ينتهي بـ /exec)
+    // الرابط الجديد الذي أرسلته
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0VUtUbUuvDra-WArUQcawRE79M2_Kiw-dxBIPx55vaLrwKv8i2eeXbptsOupFJFab0g/exec';
+    
+    let allProducts = [];
+    let cart = [];
+    let waNum = "774548481";
 
-    async function fetchData() {
+    async function loadData() {
         try {
             const res = await fetch(SCRIPT_URL);
             const data = await res.json();
             
-            // تحديث الأرقام في البطاقات
-            document.getElementById('count-orders').innerText = data.orders.length - 1;
-            document.getElementById('count-visitors').innerText = data.visitors.length - 1;
-            document.getElementById('count-products').innerText = data.products.length - 1;
-            document.getElementById('count-comments').innerText = data.comments.length - 1;
+            // جلب المنتجات (تخطي العناوين وفلترة الصفوف الفارغة)
+            allProducts = data.products.slice(1).filter(p => p[1]);
+            waNum = data.settings[3][1] || waNum;
+            document.getElementById('ticker-text').innerText = data.settings[7][1] || "أهلاً بكم في متجرنا";
+            
+            // جلب الأقسام تلقائياً
+            const categories = ['الكل', ...new Set(allProducts.map(p => p[3]).filter(c => c))];
+            document.getElementById('cats-bar').innerHTML = categories.map(c => 
+                `<div class="cat-item ${c==='الكل'?'active':''}" onclick="filterCat('${c}', this)">${c}</div>`
+            ).join('');
 
-            // تعبئة جدول الطلبات (بناءً على ملفك)
-            const ordersHtml = data.orders.slice(1).reverse().map(row => `
-                <tr>
-                    <td><b>${row[0]}</b></td>
-                    <td>${row[1]}</td>
-                    <td>${row[2]}</td>
-                    <td style="font-size:11px">${row[3]}</td>
-                    <td style="color:var(--main); font-weight:bold">${row[4]}</td>
-                    <td>${row[5]}</td>
-                </tr>
-            `).join('');
-            document.getElementById('table-orders').innerHTML = ordersHtml;
-
-            // تعبئة جدول التعليقات (مثل تعليقات أروى وأحمد)
-            const commentsHtml = data.comments.slice(1).reverse().map(row => `
-                <tr>
-                    <td><b>${row[0]}</b></td>
-                    <td>${row[1]}</td>
-                    <td>${row[3]}</td>
-                    <td><span class="status-badge status-pending">${row[4] || 'جديد'}</span></td>
-                </tr>
-            `).join('');
-            document.getElementById('table-comments').innerHTML = commentsHtml;
-
-            // تعبئة جدول الزوار
-            const visitorsHtml = data.visitors.slice(1).reverse().map(row => `
-                <tr>
-                    <td>${row[0]}</td>
-                    <td>${row[1]}</td>
-                    <td>${row[2]}</td>
-                    <td>${row[3]}</td>
-                </tr>
-            `).join('');
-            document.getElementById('table-visitors').innerHTML = visitorsHtml;
-
-            document.getElementById('loading-overlay').style.display = 'none';
+            display(allProducts);
         } catch (e) {
-            alert("خطأ في جلب البيانات، تأكد من رابط السكربت.");
+            document.getElementById('products-grid').innerHTML = "<p>تعذر جلب الملابس، يرجى التحقق من إعدادات السكربت.</p>";
         }
     }
 
-    function showTab(tab) {
-        document.getElementById('sec-orders').style.display = tab === 'orders' ? 'block' : 'none';
-        document.getElementById('sec-comments').style.display = tab === 'comments' ? 'block' : 'none';
-        document.getElementById('sec-visitors').style.display = tab === 'visitors' ? 'block' : 'none';
+    function display(items) {
+        const grid = document.getElementById('products-grid');
+        if(items.length === 0) { grid.innerHTML = "<p>لا توجد منتجات حالياً.</p>"; return; }
         
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        grid.innerHTML = items.map(p => `
+            <div class="p-card">
+                <img src="${p[4] || 'https://via.placeholder.com/150'}" class="p-img" onerror="this.src='https://via.placeholder.com/150'">
+                <div class="p-name">${p[1]}</div>
+                <span class="p-price">${p[2]} ريال</span>
+                <button class="btn-add" onclick="addToCart('${p[1]}', ${p[2]})">إضافة للسلة</button>
+            </div>
+        `).join('');
     }
 
-    window.onload = fetchData;
+    function addToCart(name, price) {
+        cart.push({name, price});
+        document.getElementById('cart-count').innerText = cart.length;
+        alert("تمت إضافة " + name + " للسلة");
+    }
+
+    function openCart() {
+        if(cart.length === 0) return alert("السلة فارغة!");
+        const list = document.getElementById('cart-items');
+        list.innerHTML = cart.map(i => `<div>- ${i.name} (${i.price} ر.ي)</div>`).join('');
+        document.getElementById('total-price').innerText = cart.reduce((a, b) => a + b.price, 0);
+        document.getElementById('cartModal').style.display = 'flex';
+    }
+
+    function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
+
+    function sendOrder() {
+        const name = document.getElementById('custName').value;
+        const addr = document.getElementById('custAddr').value;
+        if(!name || !addr) return alert("يرجى إكمال البيانات");
+
+        const msg = `*طلب جديد من المتجر*\n\n*العميل:* ${name}\n*العنوان:* ${addr}\n\n*المنتجات:*\n${cart.map(i => "- " + i.name).join('\n')}\n\n*الإجمالي:* ${document.getElementById('total-price').innerText} ريال`;
+        
+        window.location.href = `https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function filterCat(cat, el) {
+        document.querySelectorAll('.cat-item').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        display(cat === 'الكل' ? allProducts : allProducts.filter(p => p[3] === cat));
+    }
+
+    function search() {
+        const val = document.getElementById('searchInp').value.toLowerCase();
+        display(allProducts.filter(p => p[1].toLowerCase().includes(val)));
+    }
+
+    window.onload = loadData;
 </script>
 </body>
 </html>
