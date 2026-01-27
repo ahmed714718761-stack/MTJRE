@@ -7,176 +7,164 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main: #0055ff; --bg: #f4f7fa; --red: #ff3b3b; --dark: #1e293b; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); direction: rtl; text-align: right; }
+        :root { --main: #0066ff; --bg: #f4f7fa; --dark: #1a1a1a; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; direction: rtl; text-align: right; }
         
-        /* شريط الأخبار */
-        .news-ticker { background: var(--main); color: white; padding: 10px 0; overflow: hidden; font-size: 14px; font-weight: bold; }
-        .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
-        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        /* الهيدر */
+        header { background: white; padding: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo { height: 45px; }
 
-        header { background: white; padding: 15px 5%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; }
-        #logo { height: 50px; object-fit: contain; }
-
-        .search-box { margin-top: 15px; position: relative; }
-        .search-box input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-family: 'Cairo'; }
+        /* البحث والأقسام */
+        .top-bar { padding: 10px 15px; }
+        .search-box { position: relative; width: 100%; margin-bottom: 15px; }
+        .search-box input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-family: 'Cairo'; box-sizing: border-box; }
         .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #888; }
 
-        /* الأقسام */
-        .cats { display: flex; gap: 10px; overflow-x: auto; padding: 15px 5%; scrollbar-width: none; }
-        .cat-item { background: white; padding: 8px 20px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .cat-item.active { background: var(--main); color: white; }
+        .cats { display: flex; gap: 10px; overflow-x: auto; padding: 0 5% 15px; scrollbar-width: none; }
+        .cat-btn { background: white; padding: 8px 18px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .cat-btn.active { background: var(--main); color: white; }
 
         /* شبكة المنتجات */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 5% 30px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px 30px; }
         @media (min-width: 768px) { .grid { grid-template-columns: repeat(4, 1fr); } }
         
-        .p-card { background: white; border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #eee; transition: 0.3s; }
-        .p-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .p-img { width: 100%; height: 140px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; background: #f9f9f9; }
-        .p-name { font-size: 13px; font-weight: bold; height: 38px; overflow: hidden; color: var(--dark); margin-bottom: 8px; }
-        .p-price { color: var(--main); font-weight: 900; font-size: 16px; display: block; margin-bottom: 10px; }
-        .btn-add { background: var(--main); color: white; border: none; width: 100%; padding: 10px; border-radius: 12px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; }
+        .card { background: white; border-radius: 15px; padding: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #eee; }
+        .card img { width: 100%; height: 130px; object-fit: contain; border-radius: 10px; background: #f9f9f9; margin-bottom: 8px; }
+        .card h4 { font-size: 13px; margin: 5px 0; height: 36px; overflow: hidden; line-height: 1.4; }
+        .price { color: var(--main); font-weight: 900; font-size: 15px; display: block; margin-bottom: 10px; }
+        .add-btn { background: var(--main); color: white; border: none; width: 100%; padding: 8px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
 
         /* السلة */
-        .cart-btn { position: fixed; bottom: 20px; left: 20px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(0,85,255,0.3); cursor: pointer; z-index: 1000; }
-        .badge { position: absolute; top: 0; right: 0; background: var(--red); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+        .cart-float { position: fixed; bottom: 20px; left: 20px; background: var(--main); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 5px 15px rgba(0,102,255,0.4); cursor: pointer; z-index: 1001; }
+        .badge { position: absolute; top: -5px; right: -5px; background: red; color: white; font-size: 11px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
 
         /* المودال */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 25px; padding: 20px; }
-        .input-group { margin-bottom: 10px; }
-        .input-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-family: 'Cairo'; outline: none; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-body { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; }
+        .modal-body input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box; outline: none; }
     </style>
 </head>
 <body>
 
-<div class="news-ticker"><div id="ticker-text" class="ticker-content">جاري جلب أحدث العروض والملابس...</div></div>
-
 <header>
-    <div class="nav-top">
-        <img id="logo" src="https://i.ibb.co/xKt7f30s/image.png" alt="MTJRE">
-        <a href="admin.html" style="text-decoration: none; color: var(--dark); font-weight: bold; font-size: 13px;"><i class="fa fa-user-shield"></i> الإدارة</a>
-    </div>
-    <div class="search-box">
-        <i class="fa fa-search"></i>
-        <input type="text" id="searchInp" placeholder="ابحث عن الملابس أو المنتجات..." onkeyup="search()">
-    </div>
+    <img src="https://i.ibb.co/xKt7f30s/image.png" class="logo" alt="لوجو متجر MTJRE">
 </header>
 
-<div id="cats-bar" class="cats">
-    <div class="cat-item active" onclick="filterCat('الكل', this)">الكل</div>
-</div>
-
-<div id="products-grid" class="grid">
-    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
-        <i class="fa fa-spinner fa-spin" style="font-size: 30px; color: var(--main);"></i>
-        <p>جاري جلب المنتجات...</p>
+<div class="top-bar">
+    <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInput" placeholder="ابحث عن الملابس أو المنتجات..." onkeyup="search()">
     </div>
 </div>
 
-<div class="cart-btn" onclick="openCart()">
-    <i class="fa fa-shopping-bag"></i>
+<div id="cat-bar" class="cats">
+    <div class="cat-btn active" onclick="filterCat('الكل', this)">الكل</div>
+</div>
+
+<div id="product-grid" class="grid">
+    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+        <i class="fa fa-spinner fa-spin" style="font-size: 30px; color: var(--main);"></i>
+        <p>جاري جلب الملابس والمنتجات...</p>
+    </div>
+</div>
+
+<div class="cart-float" onclick="openCart()">
+    <i class="fa fa-shopping-cart"></i>
     <span id="cart-count" class="badge">0</span>
 </div>
 
 <div id="cartModal" class="modal">
-    <div class="modal-content">
-        <h3 style="margin: 0 0 15px 0;">🛒 إتمام الطلب</h3>
-        <div id="cart-items" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; font-size: 14px;"></div>
-        <div style="font-weight: bold; margin-bottom: 15px; color: var(--main);">الإجمالي: <span id="total-price">0</span> ريال</div>
+    <div class="modal-body">
+        <h3 style="margin-top: 0;">🛒 تأكيد طلبك</h3>
+        <div id="cart-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; font-size: 14px;"></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--main);">الإجمالي: <span id="cart-total">0</span> ريال</div>
         
-        <div class="input-group"><input type="text" id="custName" placeholder="الاسم الكامل"></div>
-        <div class="input-group"><input type="text" id="custAddr" placeholder="العنوان (المدينة - الشارع)"></div>
+        <input type="text" id="cName" placeholder="الاسم الكامل">
+        <input type="text" id="cAddr" placeholder="العنوان بالتفصيل">
         
-        <button onclick="sendOrder()" style="width: 100%; background: #22c55e; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; font-family: 'Cairo'; cursor: pointer;">تأكيد الطلب عبر واتساب</button>
-        <button onclick="closeCart()" style="width: 100%; background: #eee; border: none; padding: 10px; border-radius: 12px; margin-top: 10px; font-family: 'Cairo'; cursor: pointer;">إغلاق</button>
+        <button onclick="sendOrder()" style="width:100%; background:#22c55e; color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer; font-family: 'Cairo';">إرسال الطلب (واتساب)</button>
+        <button onclick="closeCart()" style="width:100%; background:#eee; border:none; padding:10px; border-radius:10px; margin-top:10px; cursor:pointer; font-family: 'Cairo';">إغلاق</button>
     </div>
 </div>
 
 <script>
-    // الرابط الجديد الذي أرسلته
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0VUtUbUuvDra-WArUQcawRE79M2_Kiw-dxBIPx55vaLrwKv8i2eeXbptsOupFJFab0g/exec';
+    // الرابط الأخير الذي أرسلته أنت
+    const APP_URL = 'https://script.google.com/macros/s/AKfycbz0VUtUbUuvDra-WArUQcawRE79M2_Kiw-dxBIPx55vaLrwKv8i2eeXbptsOupFJFab0g/exec';
     
-    let allProducts = [];
-    let cart = [];
-    let waNum = "774548481";
+    let allData = [], cart = [], waNumber = "774548481";
 
-    async function loadData() {
+    async function loadStore() {
         try {
-            const res = await fetch(SCRIPT_URL);
-            const data = await res.json();
+            const response = await fetch(APP_URL);
+            const data = await response.json();
             
-            // جلب المنتجات (تخطي العناوين وفلترة الصفوف الفارغة)
-            allProducts = data.products.slice(1).filter(p => p[1]);
-            waNum = data.settings[3][1] || waNum;
-            document.getElementById('ticker-text').innerText = data.settings[7][1] || "أهلاً بكم في متجرنا";
+            // جلب المنتجات (نبدأ من الصف الثاني لتخطي العناوين)
+            allData = data.products.slice(1).filter(p => p[1]); // p[1] هو اسم المنتج
+            waNumber = data.settings[3][1] || waNumber; // رقم الواتساب من صفحة الإعدادات
             
-            // جلب الأقسام تلقائياً
-            const categories = ['الكل', ...new Set(allProducts.map(p => p[3]).filter(c => c))];
-            document.getElementById('cats-bar').innerHTML = categories.map(c => 
-                `<div class="cat-item ${c==='الكل'?'active':''}" onclick="filterCat('${c}', this)">${c}</div>`
+            // توليد الأقسام (ملابس، إلكترونيات، إلخ)
+            const cats = ['الكل', ...new Set(allData.map(p => p[3]).filter(c => c))];
+            document.getElementById('cat-bar').innerHTML = cats.map(c => 
+                `<div class="cat-btn ${c==='الكل'?'active':''}" onclick="filterCat('${c}', this)">${c}</div>`
             ).join('');
 
-            display(allProducts);
+            render(allData);
         } catch (e) {
-            document.getElementById('products-grid').innerHTML = "<p>تعذر جلب الملابس، يرجى التحقق من إعدادات السكربت.</p>";
+            document.getElementById('product-grid').innerHTML = "تعذر جلب البيانات، يرجى إعادة المحاولة.";
         }
     }
 
-    function display(items) {
-        const grid = document.getElementById('products-grid');
-        if(items.length === 0) { grid.innerHTML = "<p>لا توجد منتجات حالياً.</p>"; return; }
-        
+    function render(items) {
+        const grid = document.getElementById('product-grid');
         grid.innerHTML = items.map(p => `
-            <div class="p-card">
-                <img src="${p[4] || 'https://via.placeholder.com/150'}" class="p-img" onerror="this.src='https://via.placeholder.com/150'">
-                <div class="p-name">${p[1]}</div>
-                <span class="p-price">${p[2]} ريال</span>
-                <button class="btn-add" onclick="addToCart('${p[1]}', ${p[2]})">إضافة للسلة</button>
+            <div class="card">
+                <img src="${p[4] || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
+                <h4>${p[1]}</h4>
+                <span class="price">${p[2]} ريال</span>
+                <button class="add-btn" onclick="addToCart('${p[1]}', ${p[2]})">إضافة للسلة</button>
             </div>
         `).join('');
     }
 
-    function addToCart(name, price) {
-        cart.push({name, price});
+    function addToCart(n, p) {
+        cart.push({n, p});
         document.getElementById('cart-count').innerText = cart.length;
-        alert("تمت إضافة " + name + " للسلة");
+        alert("تمت إضافة " + n + " للسلة");
     }
 
     function openCart() {
-        if(cart.length === 0) return alert("السلة فارغة!");
-        const list = document.getElementById('cart-items');
-        list.innerHTML = cart.map(i => `<div>- ${i.name} (${i.price} ر.ي)</div>`).join('');
-        document.getElementById('total-price').innerText = cart.reduce((a, b) => a + b.price, 0);
+        if(cart.length === 0) return alert("السلة فارغة");
+        document.getElementById('cart-list').innerHTML = cart.map(i => `• ${i.n} (${i.p} ريال)`).join('<br>');
+        document.getElementById('cart-total').innerText = cart.reduce((a, b) => a + b.p, 0);
         document.getElementById('cartModal').style.display = 'flex';
     }
 
     function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
 
     function sendOrder() {
-        const name = document.getElementById('custName').value;
-        const addr = document.getElementById('custAddr').value;
-        if(!name || !addr) return alert("يرجى إكمال البيانات");
+        const name = document.getElementById('cName').value;
+        const addr = document.getElementById('cAddr').value;
+        if(!name || !addr) return alert("الرجاء إدخال الاسم والعنوان");
 
-        const msg = `*طلب جديد من المتجر*\n\n*العميل:* ${name}\n*العنوان:* ${addr}\n\n*المنتجات:*\n${cart.map(i => "- " + i.name).join('\n')}\n\n*الإجمالي:* ${document.getElementById('total-price').innerText} ريال`;
+        const total = document.getElementById('cart-total').innerText;
+        const itemsMsg = cart.map(i => "- " + i.n).join('\n');
+        const waMsg = `*طلب جديد من متجر MTJRE*\n\n*العميل:* ${name}\n*العنوان:* ${addr}\n\n*المنتجات:*\n${itemsMsg}\n\n*الإجمالي:* ${total} ريال`;
         
-        window.location.href = `https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`;
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMsg)}`;
     }
 
-    function filterCat(cat, el) {
-        document.querySelectorAll('.cat-item').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-        display(cat === 'الكل' ? allProducts : allProducts.filter(p => p[3] === cat));
+    function filterCat(c, btn) {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        render(c === 'الكل' ? allData : allData.filter(p => p[3] === c));
     }
 
     function search() {
-        const val = document.getElementById('searchInp').value.toLowerCase();
-        display(allProducts.filter(p => p[1].toLowerCase().includes(val)));
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        render(allData.filter(p => p[1].toLowerCase().includes(term)));
     }
 
-    window.onload = loadData;
+    window.onload = loadStore;
 </script>
 </body>
 </html>
