@@ -75,7 +75,8 @@
         footer { background: var(--dark); color: #e2e8f0; padding: 40px 5% 100px; text-align: right; font-size: 14px; line-height: 1.8; border-top: 4px solid var(--main); }
         .footer-title { color: white; font-weight: 900; margin-bottom: 15px; display: block; border-right: 4px solid var(--main); padding-right: 10px; }
         .wallets-box { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
-        .wallet-card { background: #2d3748; padding: 8px 15px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #fff; border: 1px solid #4a5568; }
+        .wallet-card { background: #2d3748; padding: 8px 15px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #fff; border: 1px solid #4a5568; cursor: pointer; transition: 0.3s; }
+        .wallet-card:hover { background: #3d495d; }
         .wallet-card i { color: #48bb78; }
     </style>
 </head>
@@ -131,13 +132,9 @@
     <div style="margin-bottom:25px;"><span class="footer-title">📍 العناوين</span><p id="f-address" style="margin-right:15px;"></p></div>
     <div style="margin-bottom:25px;"><span class="footer-title">📞 التواصل المباشر</span><p id="f-contact" style="margin-right:15px;"></p></div>
     <div style="margin-bottom:25px;">
-        <span class="footer-title">💳 المحافظ الإلكترونية المدعومة</span>
-        <div class="wallets-box">
-            <div class="wallet-card"><i class="fa fa-wallet"></i> بنك الكريمي</div>
-            <div class="wallet-card"><i class="fa fa-wallet"></i> شبكة النجم</div>
-            <div class="wallet-card"><i class="fa fa-wallet"></i> موبايلي موني</div>
-            <div class="wallet-card"><i class="fa fa-wallet"></i> ون كاش</div>
-        </div>
+        <span class="footer-title">💳 حسابات التحويل (اضغط للرقم)</span>
+        <div class="wallets-box" id="wallets-list">
+            </div>
     </div>
     <div style="text-align:center; border-top:1px solid #4a5568; padding-top:20px; font-size:12px;">جميع الحقوق محفوظة لـ <b>متجر MTJRE</b> © 2026</div>
 </footer> 
@@ -170,19 +167,33 @@
             const res = await fetch(SCRIPT_URL);
             const data = await res.json();
             db = data.products.slice(1);
+            
+            // جلب الإعدادات والشعار
             document.getElementById('logo').src = data.settings[1][1];
             document.getElementById('ticker-text').innerText = data.settings[7][1];
             document.getElementById('f-address').innerText = data.settings[4][1];
             document.getElementById('f-contact').innerText = "عبر الواتساب: " + data.settings[3][1]; 
 
+            // جلب البنرات
             document.getElementById('slider-container').innerHTML = data.banners.slice(1).map((b, i) => `
                 <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')">
                     <div class="promo-badge">${b[1]}</div>
                 </div>`).join('');
                 
+            // جلب الأقسام
             const cats = ['الكل', ...new Set(db.map(p => p[3]))];
             document.getElementById('cats-bar').innerHTML = cats.map(c => `<div class="cat-item ${c==='الكل'?'active':''}" onclick="filter('${c}', this)">${c}</div>`).join('');
+            
+            // جلب التعليقات
             document.getElementById('comments-list').innerHTML = data.comments.slice(1).reverse().slice(0, 5).map(c => `<div class="comment-item"><b style="font-size:12px;">${c[0]} ✅</b><p style="margin:5px 0 0; font-size:12px;">${c[1]}</p></div>`).join(''); 
+
+            // التحديث الجديد: جلب بيانات المحافظ من شيت "حولي"
+            if(data.wallets) {
+                document.getElementById('wallets-list').innerHTML = data.wallets.slice(1).map(w => `
+                    <div class="wallet-card" onclick="alert('حساب ${w[0]}: ${w[1]}')">
+                        <i class="fa fa-wallet"></i> ${w[0]}
+                    </div>`).join('');
+            } 
 
             display(db);
         } catch(e) { console.log("Check SCRIPT_URL"); } 
@@ -197,7 +208,6 @@
 
     function display(items) {
         document.getElementById('products-grid').innerHTML = items.map((p, index) => {
-            // تشفير البيانات لإرسالها في الرابط بشكل آمن
             const pData = encodeURIComponent(JSON.stringify({
                 name: p[1],
                 price: p[2],
