@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر MTJRE المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -9,70 +10,93 @@
         :root { --main: #0055ff; --bg: #0d0221; --neon: #00f7ff; --red: #ff3b3b; }
         body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); color: white; direction: rtl; }
         
-        header { background: rgba(255,255,255,0.05); padding: 15px 5%; border-bottom: 2px solid var(--neon); box-shadow: 0 0 15px var(--neon); }
-        #logo { height: 50px; filter: drop-shadow(0 0 5px var(--neon)); }
+        header { background: rgba(255,255,255,0.05); padding: 15px 5%; border-bottom: 2px solid var(--neon); box-shadow: 0 0 15px var(--neon); position: sticky; top: 0; z-index: 1000; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        #logo { height: 45px; filter: drop-shadow(0 0 5px var(--neon)); }
         
-        .search-bar input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--neon); background: transparent; color: white; outline: none; }
+        .search-bar { flex: 1; position: relative; }
+        .search-bar input { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid var(--neon); background: rgba(0,0,0,0.5); color: white; outline: none; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; }
+        .p-card { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 15px; padding: 12px; text-align: center; transition: 0.3s; }
+        .p-card:hover { border-color: var(--neon); box-shadow: 0 0 15px var(--neon); transform: translateY(-3px); }
+        .p-img { width: 100%; height: 120px; object-fit: contain; border-radius: 8px; margin-bottom: 10px; }
+        .p-name { font-size: 13px; font-weight: bold; height: 38px; overflow: hidden; line-height: 1.4; }
+        .p-price { color: var(--neon); font-weight: 900; font-size: 17px; display: block; margin: 8px 0; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 20px; }
-        .p-card { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 15px; padding: 10px; text-align: center; transition: 0.3s; }
-        .p-card:hover { border-color: var(--neon); box-shadow: 0 0 15px var(--neon); }
-        .p-img { width: 100%; height: 130px; object-fit: contain; border-radius: 10px; }
-        .p-price { color: var(--neon); font-weight: 900; font-size: 18px; margin: 10px 0; display: block; }
+        .btn-add { background: var(--main); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; font-family: 'Cairo'; }
         
-        .btn-add { background: var(--main); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; }
-        .cart-float { position: fixed; bottom: 20px; left: 20px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px var(--main); cursor: pointer; }
+        .loading-shimmer { text-align: center; padding: 50px; font-size: 1.2em; color: var(--neon); }
+        .cart-float { position: fixed; bottom: 25px; left: 25px; background: var(--main); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px var(--main); cursor: pointer; z-index: 2000; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="nav-container">
         <img id="logo" src="" alt="MTJRE">
-        <div class="search-bar" style="flex:1; margin: 0 20px;">
-            <input type="text" placeholder="ابحث عن منتجاتك..." onkeyup="searchFunc(this.value)">
+        <div class="search-bar">
+            <input type="text" id="searchInp" placeholder="ابحث عن منتجات..." onkeyup="searchFunc(this.value)">
         </div>
     </div>
 </header>
 
 <div id="products-grid" class="grid">
-    <p style="text-align:center; grid-column: 1/-1;">جاري سحب البيانات من السحابة... ✨</p>
+    <div class="loading-shimmer">جاري سحب البيانات من السحابة... ✨</div>
 </div>
 
-<div class="cart-float" onclick="openCart()">
-    <i class="fa fa-shopping-cart"></i>
+<div class="cart-float" onclick="alert('جاري تجهيز السلة...')">
+    <i class="fa fa-shopping-basket"></i>
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_On0SKy042_bycP_ia2iwy3n8_WKITp8lGGhRkgPBKmWAJDS8iN2frrxhjQ8qQTYqzQ/exec';
+    // الرابط المحدث الخاص بك
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzprQNifSv3P8uiPVUI-F3WORIXC2_NqbrIBVj-0u18GH4hcRoPexX0eMM8DIzc3thFyw/exec';
     let db = [];
 
-    window.onload = function() {
-        google.script.run.withSuccessHandler(function(jsonRaw) {
-            const data = JSON.parse(jsonRaw);
+    async function loadData() {
+        try {
+            const response = await fetch(SCRIPT_URL);
+            if (!response.ok) throw new Error('فشل الاتصال');
+            const data = await response.json();
+            
             db = data.products;
-            if(data.settings.length > 0) document.getElementById('logo').src = data.settings[1][1];
+            
+            // تحديث الشعار من الإعدادات
+            if(data.settings && data.settings[1]) {
+                document.getElementById('logo').src = data.settings[1][1];
+            }
+            
             display(db);
-        }).getStoreData();
-    };
+        } catch (error) {
+            console.error("خطأ:", error);
+            document.getElementById('products-grid').innerHTML = 
+                '<p style="text-align:center; color:red; grid-column:1/-1;">خطأ في تحميل البيانات. يرجى التأكد من نشر السكربت كـ Anyone.</p>';
+        }
+    }
 
     function display(items) {
-        document.getElementById('products-grid').innerHTML = items.map(p => `
+        const grid = document.getElementById('products-grid');
+        if (items.length === 0) {
+            grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">لا توجد نتائج.</p>';
+            return;
+        }
+        grid.innerHTML = items.map(p => `
             <div class="p-card">
-                <img src="${p[4] || 'https://via.placeholder.com/150'}" class="p-img">
-                <div style="font-size:13px; height:40px; margin-top:5px;">${p[1]}</div>
+                <img src="${p[4] || 'https://via.placeholder.com/150'}" class="p-img" onerror="this.src='https://via.placeholder.com/150'">
+                <div class="p-name">${p[1]}</div>
                 <span class="p-price">${p[2]} ريال</span>
-                <button class="btn-add" onclick="addToCart('${p[1]}')">إضافة للسلة</button>
+                <button class="btn-add" onclick="alert('تمت إضافة ${p[1]} للسلة')">إضافة للسلة</button>
             </div>
         `).join('');
     }
 
     function searchFunc(val) {
-        display(db.filter(p => p[1].toLowerCase().includes(val.toLowerCase())));
+        const filtered = db.filter(p => p[1].toLowerCase().includes(val.toLowerCase()));
+        display(filtered);
     }
-    
-    function addToCart(name) { alert("تمت إضافة " + name + " للسلة!"); }
-    function openCart() { alert("جاري تجهيز السلة..."); }
+
+    window.onload = loadData;
 </script>
 </body>
 </html>
