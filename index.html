@@ -119,45 +119,37 @@
     let db = [], cart = [], waNumber = ""; 
 
     async function init() {
-        try {
-            const res = await fetch(SCRIPT_URL);
-            const data = await res.json();
-            
-            db = data.products.slice(1).filter(p => p[1]); 
-            waNumber = data.settings[3][1];
+    const productsGrid = document.getElementById('products-grid');
+    try {
+        // إضافة v=1 للرابط تمنع الكاش وتجبر المتصفح على جلب أحدث البيانات
+        const res = await fetch(SCRIPT_URL + '?v=' + Date.now());
+        const data = await res.json();
+        
+        if (!data || !data.products) throw new Error("بيانات غير مكتملة");
 
-            // تعبئة البيانات الأساسية
-            document.getElementById('logo').src = data.settings[1][1];
-            document.getElementById('ticker-text').innerText = data.settings[7][1] || "أهلاً بكم في متجرنا";
-            document.getElementById('f-address').innerText = data.settings[4][1];
+        db = data.products.slice(1).filter(p => p[1]); 
+        waNumber = data.settings && data.settings[3] ? data.settings[3][1] : "967774548481";
 
-            // السلايدر
-            if(data.banners) {
-                document.getElementById('slider-container').innerHTML = data.banners.slice(1).map((b, i) => `
-                    <div class="slide ${i===0?'active':''}" style="background-image:url('${b[2]}')">
-                        <div class="promo-badge">${b[1]}</div>
-                    </div>`).join('');
-                startSlider();
-            }
+        // تحديث الواجهة
+        if (data.settings && data.settings[1]) document.getElementById('logo').src = data.settings[1][1];
+        if (data.settings && data.settings[7]) document.getElementById('ticker-text').innerText = data.settings[7][1];
+        if (data.settings && data.settings[4]) document.getElementById('f-address').innerText = data.settings[4][1];
 
-            // الأقسام
-            const cats = ['الكل', ...new Set(db.map(p => p[3]).filter(c => c))];
-            document.getElementById('cats-bar').innerHTML = cats.map(c => `
-                <div class="cat-item ${c==='الكل'?'active':''}" onclick="filterCat('${c}', this)">${c}</div>`).join('');
+        // البنرات والأقسام
+        const cats = ['الكل', ...new Set(db.map(p => p[3]).filter(c => c))];
+        document.getElementById('cats-bar').innerHTML = cats.map(c => `
+            <div class="cat-item ${c==='الكل'?'active':''}" onclick="filterCat('${c}', this)">${c}</div>`).join('');
 
-            // المحافظ
-            if(data.wallets) {
-                document.getElementById('wallets-list').innerHTML = data.wallets.slice(1).map(w => `
-                    <div class="wallet-card" onclick="copyText('${w[1]}')">
-                        <i class="fa fa-wallet"></i> <span><b>${w[0]}:</b> ${w[1]}</span>
-                    </div>`).join('');
-            }
-
-            display(db);
-        } catch(e) { 
-            document.getElementById('products-grid').innerHTML = "<p style='text-align:center'>حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.</p>";
-        }
+        display(db);
+    } catch(e) { 
+        console.error("Error:", e);
+        productsGrid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 20px;">
+                <p>⚠️ تأكد من تفعيل ملفات الارتباط في المتصفح</p>
+                <button onclick="location.reload()" style="padding:10px; background:var(--main); color:white; border:none; border-radius:8px;">إعادة تحميل</button>
+            </div>`;
     }
+}
 
     function display(items) {
         const grid = document.getElementById('products-grid');
